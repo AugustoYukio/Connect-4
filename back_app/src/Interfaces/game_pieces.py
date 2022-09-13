@@ -13,17 +13,23 @@ class IPosition(ABC):
     __status: IStatusPosition = IStatusPosition.EMPTY
     __position_value = (__x, __y)
 
+    @property
     @abstractmethod
-    def set_status(self):
+    def status(self):
         ...
 
+    @status.setter
     @abstractmethod
-    def get_status(self):
+    def status(self, status: IStatusPosition):
         ...
 
     @abstractmethod
     def value(self):
         ...
+
+
+class IBoard(ABC):
+    ...
 
 
 class IPlayerCheker(ABC):
@@ -52,13 +58,25 @@ class ISlot(ABC):
     #     raise NotImplementedError
 
 
+class IGridPart(ABC):
+    number: int
+
+
+class IColumn(IGridPart):
+    ...
+
+
+class IRow(IGridPart):
+    ...
+
+
 class IGrid(ABC):
     COLUMNS: int
     ROWS: int
-    matriz_game: List[ISlot]
+    slots: List[List[ISlot]]
 
     @abstractmethod
-    def make_grid(self):
+    def __make_grid(self):
         ...
 
 
