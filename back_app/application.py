@@ -1,14 +1,10 @@
 import os
 import secrets
-import uuid
-from flask import Flask, render_template
-from flask import session, request
+from queue import Queue
+from flask import Flask, render_template, session, request
 from flask_bcrypt import Bcrypt
-from flask_socketio import SocketIO, emit
-from flask_socketio import join_room, leave_room, \
-    close_room, rooms, disconnect
+from flask_socketio import (SocketIO, emit, join_room, leave_room,close_room, rooms, disconnect)
 from flask_sqlalchemy import SQLAlchemy
-
 # from .config import config_by_name
 
 db = SQLAlchemy()
@@ -21,11 +17,30 @@ app.config['SECRET_KEY'] = secrets.token_urlsafe(45)
 # eventlet.monkey_patch()
 socketio = SocketIO(app)
 
+PLAYERS_IN_LOBBY: Queue = Queue(20)
+
 
 # a short running task that returns immediately
 @app.route('/')
 def home():
     return render_template('index.html', )
+
+
+@socketio.on('new_player', namespace='/test')
+def new_player(data):
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    PLAYERS_IN_LOBBY.put(request.sid)
+    if not(PLAYERS_IN_LOBBY.empty()):
+        print(f'Size: {PLAYERS_IN_LOBBY.qsize()}')
+        #player_waiting = PLAYERS_IN_LOBBY.get_nowait()
+        # print(f'{player_waiting} <-:-> {request.sid}')
+        ...
+    else:
+        PLAYERS_IN_LOBBY.put(request.sid)
+
+
+    emit('my response',
+         {'data': data['data'], 'count': session['receive_count']})
 
 
 @socketio.on('my event', namespace='/test')
