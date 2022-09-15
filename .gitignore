@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *./data/*
 
 # Byte-compiled / optimized / DLL files
@@ -148,3 +149,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+=======
+node_modules
+>>>>>>> 710323e4221a15c42d7a62a1ff6e565d096e4fdd
