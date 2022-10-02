@@ -3,6 +3,8 @@ import './Menu.css';
 
 export default () => {
     return (
-        <p>Menu</p>
+        <div>
+            <p>Menu</p>
+        </div>
     )
 }

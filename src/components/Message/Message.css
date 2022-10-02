@@ -1,0 +1,9 @@
+.Message.alert {
+  display: block;
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  margin: 20px;
+  padding: 15px;
+}
