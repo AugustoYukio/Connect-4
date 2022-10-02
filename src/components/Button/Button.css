@@ -1,0 +1,11 @@
+.Button {
+  padding: 9px 15px;
+  background-color: var(--dark-blue);
+
+  color: var(--mint);
+  font-weight: 700;
+  font-size: 1em;
+
+  border: none;
+  border-radius: 10px;
+}

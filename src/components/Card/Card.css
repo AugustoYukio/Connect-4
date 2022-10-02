@@ -1,0 +1,19 @@
+.Card {
+  color: var(--dark-blue);
+  background-color: var(--mint);
+
+  border-radius: 20px;
+  border: 1px solid var(--light-gray);
+
+  padding: 20px 30px;
+}
+
+.Card hr {
+  height: 1px;
+  background-color: var(--light-gray);
+  border: none;
+}
+
+.CardTitle {
+  text-align: center;
+}

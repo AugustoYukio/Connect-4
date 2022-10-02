@@ -1,0 +1,11 @@
+.InputGroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.Label {
+  font-weight: 700;
+  color: var(--dark-blue);
+  font-size: 1.2em;
+}

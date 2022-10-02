@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "http-server",
-    "prettier": "prettier --write \"**/*.{html,css,js,json,prettierrc}\" && git add ."
+    "prettier": "prettier --write \"**/*.{html,css,js,json,prettierrc}\" && git add .",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "repository": {
     "type": "git",
@@ -29,5 +33,24 @@
     "hooks": {
       "pre-commit": "npm run prettier"
     }
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^5.3.4",
+    "react-scripts": "^5.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

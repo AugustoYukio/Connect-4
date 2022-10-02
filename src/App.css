@@ -1,0 +1,20 @@
+:root {
+  /* Cores principais do projeto */
+
+  --mint: #eef4ed;
+
+  --light-blue: #8da9c4;
+  --dark-blue: #0b2545;
+  --blue: #13315c;
+
+  --light-gray: #ddd;
+  --dark-gray: #333;
+}
+
+.App {
+  box-sizing: border-box;
+  height: 100vh;
+
+  padding: 10px;
+  font-family: monospace;
+}
