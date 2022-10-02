@@ -14,3 +14,7 @@ The original vertical four in a line game.
 2. Clone Connect4 to your computer.
 3. Run `npm install`.
 4. To start the development server, run `npm run dev`.
+
+## React
+
+Para iniciar o projeto react, rode o script "npm start" no terminal dentro da pasta Connect-4.
