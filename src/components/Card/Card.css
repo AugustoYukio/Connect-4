@@ -17,3 +17,8 @@
 .CardTitle {
   text-align: center;
 }
+
+.CardFooter {
+  display: flex;
+  justify-content: center;
+}

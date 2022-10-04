@@ -1,0 +1,20 @@
+.SignIn {
+  background-image: url("../../res/img/fundo.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.SignIn .Card {
+  width: 25%;
+}
+
+.SignIn .Button {
+  width: 100%;
+}
