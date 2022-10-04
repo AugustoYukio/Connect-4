@@ -98,7 +98,7 @@ class IGrid(ABC):
 
 
 class IPlayer(ABC):
-    number: int
+    _id_: str
 
 
 class IBoard(ABC):
@@ -111,8 +111,12 @@ class IStatusGame(Enum):
 
 
 class IGame(ABC):
-    status = IStatusGame
-    board: IBoard
-    player_1: IPlayer
-    player_2: IPlayer | None
-    player_in_turn: IPlayer | None
+    __status = IStatusGame
+    __board: IBoard
+    __player_1: IPlayer
+    __player_2: IPlayer
+    __player_in_turn: IPlayer
+
+    @abstractmethod
+    def second_player_initialize(self, player_id):
+        pass

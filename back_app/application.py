@@ -3,54 +3,56 @@ import secrets
 from queue import Queue
 from flask import Flask, render_template, session, request
 from flask_bcrypt import Bcrypt
-from flask_socketio import (SocketIO, emit, join_room, leave_room,close_room, rooms, disconnect)
+from flask_socketio import (SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect)
 from flask_sqlalchemy import SQLAlchemy
-# from .config import config_by_name
 
-db = SQLAlchemy()
-flask_bcrypt = Bcrypt()
+from back_app import create_app, create_socket
+from back_app.src.entities.model.game_objects import GameRoom
 
-template_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'src', 'views', 'templates')
-app = Flask(__name__, template_folder=template_path)
-app.config['SECRET_KEY'] = secrets.token_urlsafe(45)
-# socketio = SocketIO(app, async_mode="eventlet")
-# eventlet.monkey_patch()
-socketio = SocketIO(app)
+app = create_app()
+ws = create_socket(app)
 
-PLAYERS_IN_LOBBY: Queue = Queue(20)
+
+class Lobby(object):
+    PLAYERS_IN_LOBBY: Queue = Queue(20)
+
+
+lobby = Lobby()
 
 
 # a short running task that returns immediately
-@app.route('/')
-def home():
-    return render_template('index.html', )
 
 
-@socketio.on('new_player', namespace='/test')
+
+@ws.on('new_player', namespace='/test')
 def new_player(data):
     session['receive_count'] = session.get('receive_count', 0) + 1
     PLAYERS_IN_LOBBY.put(request.sid)
-    if not(PLAYERS_IN_LOBBY.empty()):
+    game_room = PLAYERS_IN_LOBBY.get_nowait()
+    if game_room is not None:
+        game = GameRoom(request.sid)
+
+    if not ():
+        # GameRoom(request.sid)
         print(f'Size: {PLAYERS_IN_LOBBY.qsize()}')
-        #player_waiting = PLAYERS_IN_LOBBY.get_nowait()
+        # player_waiting = PLAYERS_IN_LOBBY.get_nowait()
         # print(f'{player_waiting} <-:-> {request.sid}')
         ...
     else:
         PLAYERS_IN_LOBBY.put(request.sid)
 
-
     emit('my response',
          {'data': data['data'], 'count': session['receive_count']})
 
 
-@socketio.on('my event', namespace='/test')
+@ws.on('my event', namespace='/test')
 def test_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my response',
          {'data': message['data'], 'count': session['receive_count']})
 
 
-@socketio.on('my broadcast event', namespace='/test')
+@ws.on('my broadcast event', namespace='/test')
 def test_broadcast_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my response',
@@ -58,7 +60,7 @@ def test_broadcast_message(message):
          broadcast=True)
 
 
-@socketio.on('join', namespace='/test')
+@ws.on('join', namespace='/test')
 def join(message):
     join_room(message['room'])
     session['receive_count'] = session.get('receive_count', 0) + 1
@@ -67,7 +69,7 @@ def join(message):
           'count': session['receive_count']})
 
 
-@socketio.on('leave', namespace='/test')
+@ws.on('leave', namespace='/test')
 def leave(message):
     leave_room(message['room'])
     session['receive_count'] = session.get('receive_count', 0) + 1
@@ -76,7 +78,7 @@ def leave(message):
           'count': session['receive_count']})
 
 
-@socketio.on('close room', namespace='/test')
+@ws.on('close room', namespace='/test')
 def close(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my response', {'data': 'Room ' + message['room'] + ' is closing.',
@@ -85,7 +87,7 @@ def close(message):
     close_room(message['room'])
 
 
-@socketio.on('my room event', namespace='/test')
+@ws.on('my room event', namespace='/test')
 def send_room_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my response',
@@ -93,7 +95,7 @@ def send_room_message(message):
          room=message['room'])
 
 
-@socketio.on('disconnect request', namespace='/test')
+@ws.on('disconnect request', namespace='/test')
 def disconnect_request():
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my response',
@@ -101,12 +103,12 @@ def disconnect_request():
     disconnect()
 
 
-@socketio.on('connect', namespace='/test')
+@ws.on('connect', namespace='/test')
 def test_connect():
     emit('my response', {'data': 'Connected', 'count': 0})
 
 
-@socketio.on('disconnect', namespace='/test')
+@ws.on('disconnect', namespace='/test')
 def test_disconnect():
     print('Client disconnected', request.sid)
 
@@ -126,6 +128,6 @@ def run_server():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    ws.run(app, debug=True)
     # wsgi.server(eventlet.listen(('', 8000)), app)
     # run_server()

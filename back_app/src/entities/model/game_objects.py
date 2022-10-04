@@ -1,8 +1,10 @@
 from __future__ import annotations
+
+import secrets
 from random import randint
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Type
+from typing import List, Type, Tuple
 from back_app.src.entities.Interfaces.game_pieces import (
     IPosition, ISlot, IGrid, IPlayerChecker, IBoard, IRow, IColumn, IScore, IPlayer, IGame, IStatusGame,
     IStatusPosition)
@@ -120,7 +122,7 @@ class Grid(IGrid):
                 base_f.format(
                     *[
                         slot.position.status.value if slot.position.status == StatusPosition.EMPTY
-                        else f'Player {slot.player_checker.number}' for slot in rows
+                        else f'Player {slot.player_checker._id_}' for slot in rows
                     ]
                 )
             )
@@ -237,11 +239,10 @@ class Board(IBoard):
 
 @dataclass
 class Player(IPlayer):
-    def __init__(self, number=1):
-        self.number = number
+    _id_: str
 
     def __repr__(self):
-        return f'Player <number: {self.number}>'
+        return f'Player <ID: {self._id_}>'
 
 
 class StatusGame(IStatusGame, Enum):
@@ -250,50 +251,8 @@ class StatusGame(IStatusGame, Enum):
     STOPPED = 'STOPPED'
 
 
-@dataclass
-class Game(IGame):
-    player_2 = None
-    movements = 0
-    player_in_turn: IPlayer
-
-    def __init__(self):
-        self.player_1 = Player()
-        self.board = Board()
-        self.status_game = StatusGame('STOPPED')
-        self.score = Score()
-
-    def __random_order_for_first_game(self):
-        self.player_in_turn = [self.player_2, self.player_1][randint(0, 1)]
-
-    def __join_more_player(self):
-        self.player_2 = Player(2)
-        self.__random_order_for_first_game()
-
-    def second_player_initialize(self):
-        self.__join_more_player()
-        self.status_game = StatusGame.RUNNING
-
-    def __status_init_game(self) -> bool:
-        return self.player_2 is not None
-
-    def start(self):
-        self.status_game = StatusGame.RUNNING if self.__status_init_game() else StatusGame.WAITING
-
-    def __new_game(self):
-        if not self.__status_init_game():
-            self.status_game = StatusGame.STOPPED
-        else:
-            ...
-
-    def set_player_for_current_turn(self):
-        self.player_in_turn = player
-    def move(self, column: int):
-        self.board.set_player_checker_for_turn(self.player_in_turn)
-        self.board.do_movement(Column(column))
-
-
-def is_connected_for_4(rows: List[ISlot]):
-    # TODO: Tornar função agnóstica em relação ao jopgador
+def __is_connected_for_4(rows: List[ISlot]) -> Tuple[bool, List[Type[ISlot]]]:
+    # TODO: Tornar função agnóstica em relação ao jogador
 
     CONDITION_TO_VICTORY = THE_PRINCIPAL_NUMBER * 'p1'
     N = len(rows)
@@ -313,14 +272,82 @@ def is_connected_for_4(rows: List[ISlot]):
     return -1
 
 
+@dataclass
+class Game(IGame):
+    __player_2 = None
+    __movements = 0
+    __player_in_turn: Type[IPlayer]
+
+    def __init__(self, player_1: Type[IPlayer]):
+        self.__player_1 = player_1
+        self.__board = Board()
+        self.__status_game = StatusGame('STOPPED')
+        self.__score = Score()
+
+    def __random_order_for_first_game(self):
+        self.__player_in_turn = [self.__player_1, self.__player_2][randint(0, 1)]
+
+    def second_player_initialize(self, player_id: str):
+        self.__player_2 = Player(player_id)
+        self.__random_order_for_first_game()
+        # self.status_game = StatusGame.RUNNING
+
+    def move(self, column_number: int):
+        self.__board.set_player_checker_for_turn(self.__player_in_turn)
+        self.__board.do_movement(Column(column_number))
+
+    def __status_init_game(self) -> bool:
+        if self.__player_2 is None:
+            self.__status_game = StatusGame.WAITING
+            return False
+        return True
+
+    def start(self):
+        if self.__status_init_game():
+            self.__status_game = StatusGame.RUNNING
+            self.__random_order_for_first_game()
+        else:
+            self.__status_game = StatusGame.WAITING
+
+    def __new_game(self):
+        if not self.__status_init_game():
+            self.__status_game = StatusGame.STOPPED
+        else:
+            ...
+
+    def get_current_player(self):
+        return self.__player_in_turn
+
+    def set_player_for_current_turn(self, player: Type[IPlayer]):
+        self.__player_in_turn = player
+
+
+@dataclass
+class GameRoom:
+    game: Type[IGame]
+
+    def __init__(self, player_id: str):
+        self.game = Game(Player(player_id))
+
+    def start_new_game(self, player_id: str):
+        self.game.second_player_initialize(player_id)
+
+    def do_movement(self, move):
+        self.game.move(move)
+
+
 # Driver Code
 if __name__ == "__main__":
-    grid = Grid()
-    grid.put_checker_in_slot(Player(2), Column(3))
-    print(grid)
-    player = Player()
-    game = Game()
-    game.__join_more_player()
-    game.start()
-    game.set_player_for_current_turn()
-    game.move(3)
+    game_room = GameRoom(secrets.token_urlsafe(5))
+    game_room.start_new_game(secrets.token_urlsafe(5))
+    game_room.do_movement(4)
+    # grid = Grid()
+    # grid.put_checker_in_slot(Player(2), Column(3))
+    # print(grid)
+    # p1 = Player(secrets.token_urlsafe(5))
+    # game = Game(p1)
+
+    # game.second_player_initialize(secrets.token_urlsafe(5))
+    # game.start()
+    # game.set_player_for_current_turn()
+    # game.move(3)
