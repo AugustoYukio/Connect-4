@@ -1,9 +1,26 @@
-from . import db, bcrypt_flask, func, CheckConstraint, Column, DateTime
+from . import *
+
+
+class Book(db.Model):
+    __tablename__ = "books"
+    id = Column(db.Integer, primary_key=True)
+    title = Column(db.String)
+    author_id = Column(db.Integer, db.ForeignKey("authors.id"))
+    author = relationship("Author", backref=backref("books"))
+
+
+class Author(db.Model):
+    __tablename__ = "authors"
+    id = Column(db.Integer, primary_key=True)
+    name = Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return "<Author(name={self.name!r})>".format(self=self)
 
 
 class User(db.Model):
     __tablename__ = 'user'
-    id = Column(db.Integer, primary_key=True)
+    id = Column(db.Integer, primary_key=True, autoincrement=True)
 
     # User Authentication fields
     username = Column(db.String(50), nullable=False, unique=True)

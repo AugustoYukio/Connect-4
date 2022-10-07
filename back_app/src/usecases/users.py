@@ -1,15 +1,13 @@
-import os
 from datetime import timedelta
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_refresh_token, create_access_token
 from marshmallow import ValidationError
-
-from ..entities.DTO.user import InputLoginUserSchema, CreatUserSchema
-from ..entities.model.user import User
+from ..entities.DTO.user import (
+    InputLoginUserSchema, InputCreateUserSchema, InputLoginUserSchema, OutputLoginUserSchema, AuthorSchema, BookSchema
+)
+from ..entities.model.user import User, Author, Book
 
 bp_user = Blueprint('bp_user', __name__, url_prefix='/user')
-
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite://' + os.path.join(basedir, 'app.db')
 
 
 @bp_user.route('/ping', methods=['GET'])
@@ -17,28 +15,27 @@ def teste():
     return 'OK'
 
 
-user_schema_create = CreatUserSchema()
-
-
-@bp_user.route('/<id:str>', methods=['GET'])
-def get_user(id):
-    ...
+@bp_user.route('/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    return user_id
 
 
 @bp_user.route('/create', methods=['POST'])
 def register():
     try:
-        user = CreatUserSchema().load(request.json)
-
+        input_user = InputCreateUserSchema()
+        user = input_user.load(data=request.json)
+        user.gen_hash()
     except ValidationError as error:
         return jsonify(error), 401
 
-    user.gen_hash()
-
-    current_app.db.session.add(user)
-    current_app.db.session.commit()
-
-    return user.jsonify(user), 201
+    try:
+        with current_app.app_context() as ctx:
+            ctx.app.db.session.add(user)
+            ctx.app.db.session.commit()
+    except Exception as error:
+        return jsonify(error), 401
+    return jsonify(user), 201
 
 
 @bp_user.route('/login', methods=['POST'])

@@ -1,27 +1,22 @@
-import os
-import secrets
 from queue import Queue
-from flask import Flask, render_template, session, request
-from flask_bcrypt import Bcrypt
-from flask_socketio import (SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect)
-from flask_sqlalchemy import SQLAlchemy
-
-from back_app import create_app, create_socket
+from flask import session, request
+from flask_socketio import (emit, join_room, leave_room, close_room, rooms, disconnect)
+from back_app.factory import create_app
 from back_app.src.entities.model.game_objects import GameRoom
 
-app = create_app()
-ws = create_socket(app)
+app, ws = create_app()
 
 
 class Lobby(object):
     PLAYERS_IN_LOBBY: Queue = Queue(20)
 
 
+PLAYERS_IN_LOBBY = Lobby()
+
 lobby = Lobby()
 
 
 # a short running task that returns immediately
-
 
 
 @ws.on('new_player', namespace='/test')
@@ -129,5 +124,6 @@ def run_server():
 
 if __name__ == '__main__':
     ws.run(app, debug=True)
+
     # wsgi.server(eventlet.listen(('', 8000)), app)
     # run_server()
