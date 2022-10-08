@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App";
 
 // Dependência do bootstrap
-import "bootstrap/dist/js/bootstrap";
+import "bootstrap/dist/js/bootstrap.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
