@@ -1,11 +1,11 @@
-.canvasContainer {
+.Game .canvasContainer {
   width: 100%;
   margin: 0 auto;
   position: relative;
   font-family: "Open Sans", sans-serif;
 }
 
-.canvasContainer canvas {
+.Game .canvasContainer canvas {
   width: 100%;
   height: auto;
   position: absolute;
@@ -13,50 +13,50 @@
   top: 0;
 }
 
-.btn {
+.Game .btn {
   font-family: "Open Sans", sans-serif;
 }
 
-.big-screen-button {
+.Game .big-screen-button {
   margin: 0.25em;
   font-size: 1em;
 }
 
-.small-screen-button {
+.Game .small-screen-button {
   border-color: white;
   border-width: 1px;
 }
 
-#playAgainButton {
+.Game #playAgainButton {
   display: none;
 }
 
-#resetButton {
+.Game #resetButton {
   visibility: hidden;
 }
 
-#copyBox {
+.Game #copyBox {
   display: none;
 }
 
-.popup {
+.Game .popup {
   display: none;
 }
 
-.chipIndicator {
+.Game .chipIndicator {
   visibility: hidden;
   pointer-events: none; /* Prevent dragging */
 }
 
-#logo {
+.Game #logo {
   pointer-events: none; /* Prevent dragging */
 }
 
-#loading {
+.Game #loading {
   margin: 64px;
 }
 
-body {
+.Game {
   /* Prevent text selection */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -66,8 +66,7 @@ body {
   user-select: none;
 }
 
-html,
-body {
+.Game {
   height: 100%;
   background: white;
   background: linear-gradient(

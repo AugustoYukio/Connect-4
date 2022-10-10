@@ -1,0 +1,27 @@
+.Menu {
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--dark-blue);
+  color: var(--mint);
+}
+
+.MenuTitle {
+  font-size: 8em;
+  background-color: var(--blue);
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.Menu a,
+.Menu a:hover {
+  color: var(--mint);
+}
+
+.Menu button {
+  color: var(--mint);
+}

@@ -1,0 +1,20 @@
+.SignUp {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url("../../res/img/fundo.png");
+
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.SignUp .Card {
+  width: 25%;
+}
+
+.SignUp .Button {
+  width: 100%;
+}

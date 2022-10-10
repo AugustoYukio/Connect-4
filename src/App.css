@@ -17,3 +17,7 @@
 
   font-family: monospace;
 }
+
+.App a:hover {
+  text-decoration: none;
+}

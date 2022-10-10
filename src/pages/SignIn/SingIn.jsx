@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import './SignIn.css';
 import Card from "../../components/Card/Card";
 import Input from "../../components/Input/Input";
@@ -37,7 +37,7 @@ export default () => {
         let errors = [];
 
         if(isNullOrEmpty(user)) {
-            addError(errors, "O campo login deve ser preenchido!");
+            addError(errors, "O campo usuário deve ser preenchido!");
         }
 
         if(isNullOrEmpty(password)) {
@@ -66,7 +66,7 @@ export default () => {
 
     return (
         <div className='SignIn'>
-            {showError && <Message onClose={clearError} msgTitle="Falha ao realizar login" msgInfo="Os seguintes erros foram detectados: " errorList={error.errorList} msgType="danger" /> }
+            {showError && <Message onClose={clearError} msgTitle={error.title} msgInfo="Os seguintes erros foram detectados: " errorList={error.errorList} msgType="danger" /> }
             <Card title="Login" footerText="Novo por aqui?" linkUrl="/signup" textLink="Cadastre-se">
                 <form onSubmit={handleSubmit}>
                     <div className="form-group my-5">
