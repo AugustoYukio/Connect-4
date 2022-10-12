@@ -7,12 +7,18 @@ from flask_socketio import SocketIO
 
 try:
     from .src.entities.model.user import User
+    from .src.entities.model.theme import Theme
+    from .src.entities.model.board import Board
+    from .src.entities.model.chip import Chip
     from .src.utils.messages import MSG_TOKEN_EXPIRED, MSG_INVALID_CREDENTIALS
     from .src.entities.model import db
     from .src.entities.DTO import ma
     from .config import config
 except ImportError:
     from src.entities.model.user import User
+    from src.entities.model.theme import Theme
+    from src.entities.model.board import Board
+    from src.entities.model.chip import Chip
     from src.utils.messages import MSG_TOKEN_EXPIRED, MSG_INVALID_CREDENTIALS
     from src.entities.model import db
     from src.entities.DTO import ma
@@ -124,7 +130,7 @@ def check_and_upgrade_all_tables(app):
     app.db.create_all()
 
     # migrate database to latest revision
-    # init()
+    init()
 
     stamp()
     migrate()

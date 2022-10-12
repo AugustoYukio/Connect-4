@@ -6,8 +6,8 @@ except ImportError:
     from src.entities.model import db
 
 
-class Chip(db.Model):
-    __tablename__ = 'chip'
+class Board(db.Model):
+    __tablename__ = 'board'
 
     id = Column(db.Integer, primary_key=True)
     name = Column(db.String(50), unique=True, nullable=False)

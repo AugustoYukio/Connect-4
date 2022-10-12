@@ -14,7 +14,7 @@ from ..entities.DTO import (input_login_user_schema, fail_creation_user_schema, 
                             success_login_user_chema
                             )
 
-from ..entities.model.user import User, Author, Book
+from ..entities.model.user import User
 
 bp_user = Blueprint('bp_user', __name__, url_prefix='/user')
 

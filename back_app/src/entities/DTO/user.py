@@ -4,29 +4,7 @@ from flask_marshmallow.fields import fields
 from marshmallow import fields, validates, ValidationError, post_load
 from flask_marshmallow import Marshmallow, Schema
 from marshmallow_sqlalchemy import auto_field
-#from .. entities.model.user import User, Author, Book
-from ..model.user import User, Author, Book
-
-
-class AuthorSchema(SQLAlchemySchema):
-    class Meta:
-        model = Author
-        load_instance = True  # Optional: deserialize to model instances
-
-    id = auto_field()
-    name = auto_field()
-    books = auto_field()
-
-
-class BookSchema(SQLAlchemySchema):
-    class Meta:
-        model = Book
-        load_instance = True
-        include_relationships = True
-
-    id = auto_field()
-    title = auto_field()
-    author_id = auto_field()
+from ..model.user import User
 
 
 class InputCreateUserSchema(SQLAlchemySchema):
