@@ -5,9 +5,10 @@ from random import randint
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Type, Tuple
-from back_app.src.entities.Interfaces.game_pieces import (
+from ..Interfaces.game_pieces import (
     IPosition, ISlot, IGrid, IPlayerChecker, IBoard, IRow, IColumn, IScore, IPlayer, IGame, IStatusGame,
     IStatusPosition)
+
 
 THE_PRINCIPAL_NUMBER = 4
 

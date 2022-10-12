@@ -1,4 +1,9 @@
-from . import *
+from sqlalchemy import Column, DateTime, CheckConstraint, func
+from sqlalchemy.orm import backref, relationship
+try:
+    from back_app.src.entities.model import db, bcrypt_flask
+except ImportError:
+    from src.entities.model import db, bcrypt_flask
 
 
 class Book(db.Model):
@@ -46,7 +51,13 @@ class User(db.Model):
         self.password = bcrypt_flask.generate_password_hash(self.password).decode('utf8')
 
     def verify_password(self, password):
-        return bcrypt_flask.check_password_hash(password, self.password)
+        return bcrypt_flask.check_password_hash(self.password, password)
 
     def __repr__(self):
         return f"{self.first_name} - {self.last_name}"
+
+    def is_active(self):
+        return self.active
+
+    def is_admin(self):
+        return self.admin

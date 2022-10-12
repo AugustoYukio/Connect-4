@@ -1,12 +1,14 @@
 <<<<<<< HEAD
 *./data/*
-
+*.db
+game_database.db
+migrations/
 # Byte-compiled / optimized / DLL files
-!.gitignore
+
 
 *.xls
 *.xlsx
-!log de resultados.xlsx
+
 *.csv
 *.rar
 *.zip
@@ -20,7 +22,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-historico/
 build/
 develop-eggs/
 dist/
@@ -74,7 +75,7 @@ db.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:
-instance/
+# instance/
 .webassets-cache
 
 # Scrapy stuff:
@@ -117,8 +118,11 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+*/venv/*
+*/.venv/*
 .env
-#.venv
+.venv/*
+.venv/
 .idea
 #env/
 #venv/
@@ -149,6 +153,4 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-=======
 node_modules
->>>>>>> 710323e4221a15c42d7a62a1ff6e565d096e4fdd

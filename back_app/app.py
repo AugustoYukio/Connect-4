@@ -1,10 +1,15 @@
 from queue import Queue
 from flask import session, request
 from flask_socketio import (emit, join_room, leave_room, close_room, rooms, disconnect)
-from back_app.factory import create_app
-from back_app.src.entities.model.game_objects import GameRoom
 
-app, ws = create_app()
+try:
+    from .factory import create_app
+    from .src.entities.model.game_objects import GameRoom
+except ImportError:
+    from factory import create_app
+    from src.entities.model.game_objects import GameRoom
+
+app, ws = create_app(config_name='testing')
 
 
 class Lobby(object):
@@ -123,7 +128,4 @@ def run_server():
 
 
 if __name__ == '__main__':
-    ws.run(app, debug=True)
-
-    # wsgi.server(eventlet.listen(('', 8000)), app)
-    # run_server()
+    app.run()

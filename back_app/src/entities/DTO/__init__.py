@@ -1,8 +1,11 @@
-from flask_marshmallow.sqla import SQLAlchemySchema
-from flask_marshmallow.fields import fields
-from marshmallow import fields, validates, ValidationError, post_load
-from flask_marshmallow import Marshmallow
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from . user import (
+     InputCreateUserSchema, InputLoginUserSchema, FailCreationUserSchema, FailLoginUserSchema,
+     SuccessLoginUserSchema, Marshmallow
+     )
 
+input_create_user_schema = InputCreateUserSchema()
+input_login_user_schema = InputLoginUserSchema()
+fail_creation_user_schema = FailCreationUserSchema()
+success_login_user_chema = SuccessLoginUserSchema()
 ma = Marshmallow()
 
