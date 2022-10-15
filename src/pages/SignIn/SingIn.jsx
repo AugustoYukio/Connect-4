@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import './SignIn.css';
 import Card from "../../components/Card/Card";
 import Input from "../../components/Input/Input";
@@ -11,6 +12,8 @@ export default () => {
         errorList: []
     }
 
+    let history = useHistory();
+    
     const [login, setLogin] = useState("");
     const [pwd, setPwd] = useState("");
     const [error, setError] = useState(initialErrorState);
@@ -35,7 +38,7 @@ export default () => {
 
     const validate = (user, password) => {
         let errors = [];
-
+        
         if(isNullOrEmpty(user)) {
             addError(errors, "O campo usuário deve ser preenchido!");
         }
@@ -44,20 +47,33 @@ export default () => {
             addError(errors, "O campo senha deve ser preenchido!");
         }
 
-        return errors.length == 0;
+        if(errors.length > 0){        
+            return false;
+        }
+        
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "http://127.0.0.1:5000/user/login", false);
+        xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify({"username": user, "password": password}));
+        
+        if(xhttp.status == 200){
+            var json_response = JSON.parse(xhttp.responseText);
+            localStorage.setItem("token", json_response.token);
+            return true;
+        }
+
+        if(xhttp.status == 401){
+            addError(errors, "Login e/ou Senha inválidos!");
+            return false;
+        }
     }
 
     const handleSubmit = async e => {
+
         e.preventDefault();
-        clearError();
-
-        let result = validate(login, pwd);
-
-        if(result) {
-            console.log("Tudo certo!")
-        } else {
-            console.log("Ocorreu um erro!")
-        }
+        clearError();        
+        validate(login, pwd) ? history.push('/home') : history.push('/signin');
     }
 
     useEffect(() => {
