@@ -1,13 +1,13 @@
 from typing import Union
 from flask_marshmallow.sqla import SQLAlchemySchema
-from flask_marshmallow.fields import fields
-from marshmallow import fields, validates, ValidationError, post_load
-from flask_marshmallow import Marshmallow, Schema
+from marshmallow import Schema, fields
 from marshmallow_sqlalchemy import auto_field
+
+from .base_schemas import Fail
 from ..model.user import User
 
 
-class InputCreateUserSchema(SQLAlchemySchema):
+class UserSchema(SQLAlchemySchema):
     class Meta:
         # unknown = EXCLUDE
         model = User
@@ -26,23 +26,25 @@ class InputCreateUserSchema(SQLAlchemySchema):
     last_name = auto_field()
 
 
+class ValidateUserSchema(UserSchema):
+    ...
+
+
 class InputLoginUserSchema(Schema):
     username = fields.Str(required=True)
     password = fields.Str(required=True)
 
 
-class FailCreationUserSchema(Schema):
-    errors = fields.List(cls_or_instance=Union[fields.Dict], required=True)
+class FailCreationUserSchema(Fail):
     message = fields.Str(default='Fail Creation User',  required=True)
 
 
-class FailLoginUserSchema(Schema):
-    errors = fields.Tuple(tuple_fields=(fields.String(),), required=True)
+class FailLoginUserSchema(Fail):
+    # errors = fields.Tuple(tuple_fields=(fields.String(),), required=True)
     message = fields.Str(default='Login Fail')
 
 
 class SuccessLoginUserSchema(Schema):
-    username = fields.Str(required=True)
     token = fields.Str(required=True)
     refresh_token = fields.Str(required=True)
     message = fields.Str(required=True)

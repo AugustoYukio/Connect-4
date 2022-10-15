@@ -1,9 +1,12 @@
 import os
+
+import ipdb
 from flask import Flask, jsonify
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate, upgrade, migrate, init, stamp
 from flask_socketio import SocketIO
+from flask_cors import CORS
 
 try:
     from .src.entities.model.user import User
@@ -28,11 +31,21 @@ migration = Migrate()
 
 bcrypt_flask = Bcrypt()
 
+cors = CORS()
+
 
 def config_db(app):
     db.init_app(app)
     bcrypt_flask.init_app(app)
     app.db = db
+
+
+def configure_migration(app):
+    migration.init_app(app=app, db=app.db)
+
+
+def configure_cors(app):
+    cors.init_app(app)
 
 
 def configure_jwt(app):
@@ -48,6 +61,7 @@ def configure_jwt(app):
 
         if user:
             return {
+                'username': user.username,
                 'is_active': user.active,
                 'is_admin': user.admin
             }
@@ -106,32 +120,47 @@ def configure_blueprint(app):
         from src.usecases.home import bp_home
     app.register_blueprint(bp_home)
 
+    try:
+        from .src.usecases.chips import bp_chip
+    except ImportError:
+        from src.usecases.chips import bp_chip
+    app.register_blueprint(bp_chip)
+
+    try:
+        from .src.usecases.themes import bp_theme
+    except ImportError:
+        from src.usecases.themes import bp_theme
+    app.register_blueprint(bp_theme)
+
 
 def create_app(config_name=os.getenv('FLASK_ENV'), name='back_app'):
     template_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'src', 'views', 'templates')
     app = Flask(name, template_folder=template_path)
 
-    app.config.from_object(config[config_name])  # from_object(AppConfig)
-
+    app.config.from_object(config[config_name])
     config_db(app)
     config_ma(app)
-    migration.init_app(app=app, db=app.db)
+    configure_migration(app)
 
     configure_jwt(app)
     configure_blueprint(app)
+    configure_cors(app)
     ws = create_socket(app)
     return app, ws
 
 
-def check_and_upgrade_all_tables(app):
+def check_and_upgrade_all_tables(app, directory=None):
     app.app_context().push()
 
     # create database and tables
     app.db.create_all()
+    # ipdb.set_trace()
+    if directory is None:
+        directory = os.path.join(app.root_path, app.extensions['migrate'].directory)
+    # checa se o diretório migrations já foi inicializado
+    if not (os.access(directory, os.F_OK) and os.listdir(directory)):
+        init()
 
-    # migrate database to latest revision
-    init()
-
-    stamp()
-    migrate()
-    upgrade()
+    stamp(directory=directory)
+    migrate(directory=directory)
+    upgrade(directory=directory)

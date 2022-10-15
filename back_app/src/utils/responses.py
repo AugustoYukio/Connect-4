@@ -9,9 +9,9 @@ from .messages import MSG_ALREADY_EXISTS, MSG_PERMISSION_DENIED
 def resp_data_invalid(
     resource: str, errors: dict, msg: str = MSG_INVALID_DATA
 ):
-    '''
+    """
     Responses 422 Unprocessable Entity
-    '''
+    """
 
     if not isinstance(resource, str):
         raise ValueError('O recurso precisa ser uma string.')
@@ -49,9 +49,9 @@ def resp_exception(
 
 
 def resp_does_not_exist(resource: str, description: str):
-    '''
+    """
     Responses 404 Not Found
-    '''
+    """
 
     if not isinstance(resource, str):
         raise ValueError('O recurso precisa ser uma string.')
@@ -67,9 +67,9 @@ def resp_does_not_exist(resource: str, description: str):
 
 
 def resp_already_exists(resource: str, description: str):
-    '''
+    """
     Responses 400
-    '''
+    """
 
     if not isinstance(resource, str):
         raise ValueError('O recurso precisa ser uma string.')
@@ -85,9 +85,9 @@ def resp_already_exists(resource: str, description: str):
 
 
 def resp_ok(resource: str, message: str, data=None, **extras):
-    '''
+    """
     Responses 200
-    '''
+    """
 
     response = {'status': 200, 'message': message, 'resource': resource}
 

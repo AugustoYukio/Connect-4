@@ -15,6 +15,6 @@ MSG_RESOURCE_UPDATED = '{} atualizado(a).'
 MSG_RESOURCE_DELETED = '{} deletado(a).'
 
 MSG_TOKEN_CREATED = 'Token criado.'
-MSG_INVALID_CREDENTIALS = 'As credenciais estão inválidas para log in.'
+MSG_INVALID_CREDENTIALS = r'Invalid login and/or password'
 MSG_TOKEN_EXPIRED = 'Token expirou.'
 MSG_PERMISSION_DENIED = 'Permissão negada.'
