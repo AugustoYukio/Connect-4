@@ -1,10 +1,13 @@
 from eventlet.websocket import BadRequest
 from flask import jsonify
 from marshmallow import ValidationError
+from sqlalchemy import select, delete
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import Delete, Select, update
 
-from ..entities.DTO import validate_chip_schema,fail_creation_chip_schema, fail_delete_chip_schema, \
-    success_delete_chip_schema, fail_update_chip_schema, success_update_chip_schema
+from ..entities.DTO import validate_chip_schema, fail_creation_chip_schema, fail_delete_chip_schema, \
+    success_delete_chip_schema, fail_update_chip_schema, success_update_chip_schema, fail_get_chip_schema, \
+    success_get_chip_schema
 from ..entities.model.chip import Chip
 
 
@@ -37,7 +40,7 @@ def create_chip(ctx_app, data):
         return jsonify(fail), 400
 
     else:
-        return jsonify(validate_chip_schema.dump(chip)), 201
+        return validate_chip_schema.dump(chip), 201
 
 
 def delete_chip(ctx_app, data):
@@ -48,7 +51,7 @@ def delete_chip(ctx_app, data):
         ), 404
 
     try:
-        affected_rows = ctx_app.db.session.execute(Delete(Chip).where(Chip.id.is_(_id)))
+        affected_rows = ctx_app.db.session.execute(delete(Chip).where(Chip.id.is_(_id)))
         if affected_rows.rowcount == 0:
             return fail_delete_chip_schema.load(
                 {'message': 'Fail Delete', 'errors': [{1: f"Chip id: {_id} not found"}]}
@@ -59,21 +62,69 @@ def delete_chip(ctx_app, data):
             {'message': 'Fail Delete', 'errors': [erro for erro in error.args]}
         ), 400
 
-    return success_delete_chip_schema.load({'data': f'affected rows: {affected_rows.rowcount}', 'message': 'success'}), 202
+    return success_delete_chip_schema.load(
+        {'data': f'affected rows: {affected_rows.rowcount}', 'message': 'success'}), 202
 
 
-def update_chip(ctx_app, data, _id):
-    found_chip = Chip.query.where(Chip.id == _id).first()
-    if found_chip is None:
-        return fail_update_chip_schema.load(
-            {'errors': [{1: "Chip id must not be empty and must exist."}], 'message': "Fail Update Chip"})
+def update_chip(ctx_app, data):
+    chip_id = data.pop('id', None)
+
+    if chip_id is None:
+        return fail_update_chip_schema.load({'errors': [{1: f"Chip id must not empty."}]}), 404
+
+    chip = find_chip(ctx_app, chip_id)
     try:
-        validate_chip_schema.load(data=data)
+        valid_data = validate_chip_schema.dump(data)
     except ValidationError as error:
-        fail = fail_update_chip_schema.load(
-            {'errors': [erro for erro in error.args], 'message': "Fail Update Chip"})
-        return jsonify(fail), 301
+        return fail_update_chip_schema.dump({'errors': [erro for erro in error.args]}), 400
 
-    ctx_app.db.session.execute(update(Chip).where(Chip.id == found_chip.id).values(**data))
-    ctx_app.db.session.commit()
-    return success_update_chip_schema.load({'message': "Success Update Chip"}), 200
+    chip_update = chip[0] | valid_data
+    try:
+        affected_rows = ctx_app.db.session.execute(
+            update(Chip).where(Chip.id.is_(chip[0].get('id'))).values(**valid_data))
+        if affected_rows.rowcount == 0:
+            return fail_update_chip_schema.load({'errors': [{1: f"Chip id: {data.get('id')} not found"}]}), 404
+    except (IntegrityError,) as error:
+        return fail_update_chip_schema.load(
+            {'errors': [{n_erro + 1: erro} for n_erro, erro in enumerate(error.orig.args)]}), 400
+    else:
+        ctx_app.db.session.commit()
+    return success_update_chip_schema.dump(chip_update), 202
+
+
+#
+#    chip_id = data.pop('id', None)
+#    if chip_id is None:
+#        return fail_update_chip_schema.load(
+#            {'errors': [{1: "Chip id must not be empty and must exist."}], 'message': "Fail Update Chip"})
+
+#    found_chip = Chip.query.where(Chip.id.is_(chip_id)).first()
+#    try:
+#        validate_chip_schema.load(data=data)
+#    except ValidationError as error:
+#        fail = fail_update_chip_schema.load(
+#            {'errors': [erro for erro in error.args], 'message': "Fail Update Chip"})
+#        return jsonify(fail), 301
+
+#    ctx_app.db.session.execute(update(Chip).where(Chip.id == found_chip.id).values(**data))
+#    ctx_app.db.session.commit()
+#    return success_update_chip_schema.load({'message': "Success Update Chip"}), 200
+
+
+def find_chip(ctx_app, chip_id: str):
+    # found_chip = ctx_app.db.session.execute(select(Chip).where(Chip.id.is_(chip_id))).first()
+
+    if not chip_id:
+        return fail_get_chip_schema.load({'errors': [{1: 'chip_id must not be empty'}]})
+    try:
+        clausule = Chip.id.is_(chip_id)
+        db_reponse = ctx_app.db.session.execute(select(Chip).where(clausule)).first()
+        if db_reponse is None:
+            return fail_get_chip_schema.dump(
+                {'errors': [{1: 'Not Found'}], 'message': f'Chip id: {chip_id} not found'}
+            ), 200
+        found_chip = db_reponse[0]
+        return success_get_chip_schema.dump(found_chip), 200
+    except ValidationError as error:
+        fail = fail_get_chip_schema.load({'errors': [erro for erro in error.args], 'message': "Fail Creation"})
+        return fail, 301

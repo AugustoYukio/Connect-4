@@ -5,25 +5,16 @@ from ..utils.users import create_user, authenticate, find_user, delete_user, upd
 bp_user = Blueprint('bp_user', __name__, url_prefix='/user')
 
 
-@bp_user.route('/ping', methods=['GET'])
-def teste():
-    return 'OK'
-
-
 @bp_user.route('/<user_id>', methods=['GET'])
 # @jwt_required()
-def get_user(user_id):
-    return find_user(current_app, user_id, only_active=False)
+def get(user_id):
+    only_active = False
+    return find_user(current_app, user_id, only_active)
 
 
-@bp_user.route('/create', methods=['POST'])
+@bp_user.route('/', methods=['POST'])
 def create():
     return create_user(current_app, request.get_json())
-
-
-@bp_user.route('/login', methods=['POST'])
-def login():
-    return authenticate(request.get_json())
 
 
 @bp_user.route('/<user_id>', methods=['DELETE'])
@@ -32,11 +23,16 @@ def delete(user_id):
     return delete_user(current_app, user_id, force_delete=force)
 
 
-@bp_user.route('/<user_id>', methods=['PUT'])
-def udpate(user_id):
+@bp_user.route('/', methods=['PUT'])
+def udpate():
     force = True
     data = request.get_json()
-    return update_user(current_app, data, force_delete=force)
+    return update_user(current_app, data, force)
+
+
+@bp_user.route('/login', methods=['POST'])
+def login():
+    return authenticate(request.get_json())
 
 
 @bp_user.route('/proibido', methods=['GET'])

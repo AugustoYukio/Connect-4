@@ -11,6 +11,7 @@ class ChipsSchema(SQLAlchemySchema):
         model = Chip
         load_instance = True
 
+    id_ = fields.Integer(required=True, data_key="id", attribute='id', dump_only=True)
     name = fields.Str(required=True)
     url = fields.Str(required=True)
 
@@ -35,7 +36,15 @@ class FailDeleteChipSchema(Fail):
     ...
 
 
-class SuccessUpdateChipSchema(Success):
+class SuccessGetChipSchema(ValidateChipSchema):
+    ...
+
+
+class FailGetChipSchema(Fail):
+    ...
+
+
+class SuccessUpdateChipSchema(ValidateChipSchema):
     ...
 
 

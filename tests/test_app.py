@@ -47,7 +47,6 @@ def test_deve_falhar_por_falta_de_username(client, unauthenticated_headers):
         "first_name": "Mafycon",
         "last_name": "da Silvfa",
         "password": "#$@$#a1!@#3$%34*__s23da4sd6a1!@#sASDd6gdfm<M5as4d89a",
-
         "default_theme": 0,
         "active": True,
         "avatar_url": "https://cdn.pixabay.com/photo/2021/06/07/13/46/user-6318008_960_720.png"
@@ -98,7 +97,7 @@ def test_deve_retornar_um_user(client, user_db, header_with_access_token):
     user_id = user.id
 
     result = client.get(
-        url_for('bp_user.get_user', user_id=user_id, _external=True), headers=header_with_access_token
+        url_for('bp_user.get', user_id=user_id, _external=True), headers=header_with_access_token
     )
     logging.info(result.json)
     assert result.status_code == 200
@@ -109,7 +108,7 @@ def test_falhar_sem_retornar_um_user(client, user_db, header_with_access_token):
     user_id = random.randint(9999, 99999)
 
     result = client.get(
-        url_for('bp_user.get_user', user_id=user_id, _external=True), headers=header_with_access_token
+        url_for('bp_user.get', user_id=user_id, _external=True), headers=header_with_access_token
     )
     logging.info(result.json)
     assert result.status_code == 200
@@ -119,7 +118,7 @@ def test_falhar_sem_retornar_um_user(client, user_db, header_with_access_token):
 def test_falhar_sem_retornar_um_user_por_id_invalido(client, user_db, header_with_access_token):
 
     result = client.get(
-        url_for('bp_user.get_user', user_id='', external=True), headers=header_with_access_token
+        url_for('bp_user.get', user_id='', external=True), headers=header_with_access_token
     )
     logging.info(result.json)
     assert result.status_code == 404
