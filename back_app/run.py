@@ -31,8 +31,6 @@ if __name__ == '__main__':
     debug = app.config['DEBUG']
     if debug:
         ip = 'localhost'
-    eventlet.wsgi.server(eventlet.listen((ip, port)), app)
+    # eventlet.wsgi.server(eventlet.listen((ip, port)), app)
     # executa o servidor web do flask
-    #app.run(
-    #    host=ip, debug=debug, port=port, use_reloader=debug
-    #)
+    app.run(host=ip, debug=debug, port=port, use_reloader=debug)

@@ -48,10 +48,10 @@ def delete_chip(ctx_app, data):
         ), 404
 
     try:
-        n_rows_to_delete = ctx_app.db.session.execute(Delete(Chip).where(Chip.id == _id))
-        if n_rows_to_delete.rowcount == 0:
+        affected_rows = ctx_app.db.session.execute(Delete(Chip).where(Chip.id.is_(_id)))
+        if affected_rows.rowcount == 0:
             return fail_delete_chip_schema.load(
-                {'message': 'Fail Delete', 'errors': [{1: f"Chip id: {_id} not find"}]}
+                {'message': 'Fail Delete', 'errors': [{1: f"Chip id: {_id} not found"}]}
             ), 404
         ctx_app.db.session.commit()
     except ValidationError as error:
@@ -59,7 +59,7 @@ def delete_chip(ctx_app, data):
             {'message': 'Fail Delete', 'errors': [erro for erro in error.args]}
         ), 400
 
-    return success_delete_chip_schema.load({'data': f'affected rows: {n_rows_to_delete}', 'message': 'success'}), 202
+    return success_delete_chip_schema.load({'data': f'affected rows: {affected_rows.rowcount}', 'message': 'success'}), 202
 
 
 def update_chip(ctx_app, data, _id):

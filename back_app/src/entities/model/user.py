@@ -1,5 +1,3 @@
-from sqlalchemy import Column, DateTime, CheckConstraint, func
-from sqlalchemy.orm import backref, relationship
 try:
     from back_app.src.entities.model import db, bcrypt_flask
 except ImportError:
@@ -8,27 +6,35 @@ except ImportError:
 
 class User(db.Model):
     __tablename__ = 'user'
-    id = Column(db.Integer, primary_key=True, autoincrement=True)
+    __table_args__ = (
+        db.CheckConstraint('secondary_email!=principal_email', name='check_emails_must_different'),
+        db.CheckConstraint('LENGTH(principal_email) > 10', name='principal_email_must_minimum_length')
+    )
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
     # User Authentication fields
-    username = Column(db.String(50), nullable=False, unique=True)
-    email_confirmed_at = Column(db.DateTime())
-    password = Column(db.String(255), nullable=False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    email_confirmed_at = db.Column(db.DateTime())
+    password = db.Column(db.String(255), nullable=False)
+    # password_confirmation = db.Column(db.String(255), nullable=False)
 
     # User generic data
-    secondary_email = Column(db.String(255), nullable=True, unique=True)
-    principal_email = Column(db.String(255), nullable=False, unique=True)
-    avatar_url = Column(db.String(255), nullable=True, unique=False)
-    default_theme = Column(db.Integer, CheckConstraint('default_theme>0'))
-    admin = Column(db.Boolean, nullable=False, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    principal_email = db.Column(
+        db.String(255),
+        nullable=False, unique=True
+    )
+    secondary_email = db.Column(db.String(255), nullable=True, unique=True)
+    avatar_url = db.Column(db.String(255), nullable=True, unique=False)
+    default_theme = db.Column(db.Integer, db.CheckConstraint('default_theme>0'))
+    admin = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=db.func.now())
 
     # User fields
-    active = Column(db.Boolean())
-    first_name = Column(db.String(50), nullable=False)
+    active = db.Column(db.Boolean(), default=True)
+    first_name = db.Column(db.String(50), nullable=False)
     # NOT NULL
-    last_name = Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
 
     def gen_hash(self):
         self.password = bcrypt_flask.generate_password_hash(self.password).decode('utf8')
