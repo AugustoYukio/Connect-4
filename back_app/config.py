@@ -4,15 +4,7 @@ import secrets
 
 BASE_PATH = path.dirname(path.realpath(__file__))
 
-
-
-
 LOCAL_DATABASE_URI = path.join(BASE_PATH, "game_database.db")
-
-
-# class Config(object):
-#    SQLALCHEMY_DATABASE_URI = getenv('SQLALCHEMY_DATABASE_URI', f"sqlite:///{LOCAL_DATABASE_URI}")
-#  SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class Config:

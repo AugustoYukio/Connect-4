@@ -1,23 +1,33 @@
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_header
-from ..utils.users import create_user, authenticate
+from ..utils.users import create_user, authenticate, find_user, delete_user, update_user
 
 bp_user = Blueprint('bp_user', __name__, url_prefix='/user')
 
 
-@bp_user.route('/ping', methods=['GET'])
-def teste():
-    return 'OK'
+@bp_user.route('/<user_id>', methods=['GET'])
+# @jwt_required()
+def get(user_id):
+    only_active = False
+    return find_user(current_app, user_id, only_active)
 
 
-@bp_user.route('/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    return user_id
-
-
-@bp_user.route('/create', methods=['POST'])
-def register():
+@bp_user.route('/', methods=['POST'])
+def create():
     return create_user(current_app, request.get_json())
+
+
+@bp_user.route('/<user_id>', methods=['DELETE'])
+def delete(user_id):
+    force = True
+    return delete_user(current_app, user_id, force_delete=force)
+
+
+@bp_user.route('/', methods=['PUT'])
+def udpate():
+    force = True
+    data = request.get_json()
+    return update_user(current_app, data, force)
 
 
 @bp_user.route('/login', methods=['POST'])
