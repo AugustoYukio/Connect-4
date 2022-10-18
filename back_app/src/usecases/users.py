@@ -1,6 +1,5 @@
-from flask import Blueprint, request, jsonify, current_app
-from flask_jwt_extended import jwt_required, get_jwt_header
-from ..utils.users import create_user, authenticate, find_user, delete_user, update_user
+from . import (Blueprint, request, current_app, jwt_required, get_jwt_header, jsonify)
+from back_app.src.utils.users import create_user, authenticate, find_user, delete_user, update_user
 
 bp_user = Blueprint('bp_user', __name__, url_prefix='/user')
 

@@ -1,12 +1,7 @@
 from datetime import timedelta
-from eventlet.websocket import BadRequest
-from flask import jsonify
+from . import *
 from flask_jwt_extended import create_access_token, create_refresh_token
-from marshmallow import ValidationError
-from sqlalchemy import select, delete, and_, or_, update
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.testing import eq_
-
+from . import *
 from ..entities.DTO import (fail_get_user_schema,
                             validate_user_schema, fail_creation_user_schema,
                             input_login_user_schema, fail_delete_user_schema,
@@ -126,7 +121,8 @@ def delete_user(ctx_app, user_id, force_delete=False):
 
 
 def update_user(ctx_app, data, force=False):
-    if not data.get('id'):
+    user_id = data.pop('id', None)
+    if not user_id:
         return fail_update_user_schema.load({'errors': [{1: f"User id must not empty."}]}), 404
 
     user = find_user(ctx_app, data.get('id'), False)
@@ -140,7 +136,7 @@ def update_user(ctx_app, data, force=False):
         affected_rows = ctx_app.db.session.execute(
             update(User).where(User.id.is_(user[0].get('id'))).values(**valid_data))
         if affected_rows.rowcount == 0:
-            return fail_update_user_schema.load({'errors': [{1: f"User id: {data.get('id')} not found"}]}), 404
+            return fail_update_user_schema.load({'errors': [{1: f"User id: {user_id} not found"}]}), 404
     except (IntegrityError,) as error:
         return fail_update_user_schema.load(
             {'errors': [{n_erro + 1: erro} for n_erro, erro in enumerate(error.orig.args)]}), 400

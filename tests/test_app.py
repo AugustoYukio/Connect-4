@@ -117,8 +117,6 @@ def test_falhar_sem_retornar_um_user(client, user_db, header_with_access_token):
 
 def test_falhar_sem_retornar_um_user_por_id_invalido(client, user_db, header_with_access_token):
 
-    result = client.get(
-        url_for('bp_user.get', user_id='', external=True), headers=header_with_access_token
-    )
+    result = client.get(url_for('bp_user.get', user_id='', external=True), headers=header_with_access_token)
     logging.info(result.json)
-    assert result.status_code == 404
+    assert result.status_code == 405

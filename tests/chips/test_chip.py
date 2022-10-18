@@ -42,9 +42,9 @@ def test_deve_deletar_um_chip_by_id(client, header_with_access_token, chip_db):
     if first_chip is None:
         test_cria_nova_chip(client, header_with_access_token, chip_db)
         first_chip = chip_db.query.first()
-    payload = json.dumps({'id': first_chip.id})
 
-    result = client.delete(url_for('bp_chip.delete', _external=True), headers=header_with_access_token, data=payload)
+    result = client.delete(url_for('bp_chip.delete', chip_id=first_chip.id, _external=True),
+                           headers=header_with_access_token)
     assert result.status_code == 202
     assert result.json.get('message') == 'success'
 
