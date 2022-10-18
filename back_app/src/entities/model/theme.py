@@ -17,4 +17,4 @@ class Theme(db.Model):
     board_id = Column(db.Integer, db.ForeignKey("board.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    db.UniqueConstraint(chip1_id, chip2_id, board_id)
+    db.UniqueConstraint(chip1_id, chip2_id)

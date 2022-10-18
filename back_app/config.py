@@ -1,6 +1,5 @@
 from datetime import timedelta
-from os import getenv, path, getcwd
-import secrets
+from os import getenv, path
 
 BASE_PATH = path.dirname(path.realpath(__file__))
 
@@ -8,8 +7,8 @@ LOCAL_DATABASE_URI = path.join(BASE_PATH, "game_database.db")
 
 
 class Config:
-    SECRET_KEY = getenv('SECRET_KEY', secrets.token_urlsafe(45))
-    JWT_SECRET_KEY = getenv('JWT_SECRET_KEY', secrets.token_urlsafe(45))
+    SECRET_KEY = getenv('SECRET_KEY',  r'ryCnZACKw3tkZ2ugN4lZefbO_rHPdbmkgDi6RvwSnZ7VPn04DjaY2XPe3kJr')
+    JWT_SECRET_KEY = getenv('JWT_SECRET_KEY', r'ryCnZACKw3tkZ2ugN4lZefbO_rHPdbmkgDi6RvwSnZ7VPn04DjaY2XPe3kJr')
     PORT = int(getenv('PORT', 5000))
     DEBUG = getenv('DEBUG') or False
     PROPAGATE_EXCEPTIONS = True

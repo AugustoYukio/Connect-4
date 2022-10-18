@@ -132,6 +132,12 @@ def configure_blueprint(app):
         from src.usecases.themes import bp_theme
     app.register_blueprint(bp_theme)
 
+    try:
+        from .src.usecases.boards import bp_board
+    except ImportError:
+        from src.usecases.boards import bp_board
+    app.register_blueprint(bp_board)
+
 
 def create_app(config_name=os.getenv('FLASK_ENV'), name='back_app'):
     template_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'src', 'views', 'templates')

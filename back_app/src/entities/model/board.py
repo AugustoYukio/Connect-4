@@ -1,5 +1,5 @@
 from sqlalchemy import Column, DateTime, CheckConstraint, func
-from sqlalchemy.orm import backref, relationship
+
 try:
     from back_app.src.entities.model import db
 except ImportError:

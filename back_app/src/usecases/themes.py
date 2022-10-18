@@ -1,71 +1,30 @@
-import ipdb
-from flask import Blueprint, request, jsonify, current_app
-from marshmallow import ValidationError
-from werkzeug.exceptions import BadRequest
-
-from ..entities.DTO import validate_theme_schema, fail_creation_theme_schema
-
+from . import (Blueprint, jwt_required, current_app, request)
+from back_app.src.utils.themes import create_theme, find_theme, update_theme, delete_theme
 
 bp_theme = Blueprint('bp_theme', __name__, url_prefix='/theme')
 
 
-@bp_theme.route('/create', methods=['POST'])
-def register():
-    try:
-        data = request.get_json()
-        theme = validate_theme_schema.load(data=data)
-
-    except ValidationError as error:
-        # import ipdb;ipdb.set_trace()
-        fail = fail_creation_theme_schema.load({'errors': [erro for erro in error.args], 'message': "Fail Creation"})
-        return jsonify(fail), 301
-    except BadRequest as error:
-        fail = fail_creation_theme_schema.load(
-            {'error': [{'description': error.description}], 'message': "Fail Creation"})
-        return jsonify(fail), 400
-
-    try:
-        with current_app.app_context() as ctx:
-            ctx.app.db.session.add(theme)
-            ctx.app.db.session.commit()
-    except Exception as error:
-        with current_app.app_context() as ctx:
-            ctx.app.db.session.rollback()
-            ctx.app.db.session.commit()
-
-        fail = fail_creation_theme_schema.load(
-            {'errors': [{n_erro + 1: erro} for n_erro, erro in enumerate(error.orig.args)],
-             'message': "Fail Creation"}
-        )
-        return jsonify(fail), 500
+@bp_theme.route('/', methods=['POST'])
+@jwt_required()
+def create():
+    data = request.get_json()
+    return create_theme(current_app, data)
 
 
-@bp_theme.route('/update', methods=['POST'])
+@bp_theme.route('/<chip_id>', methods=['GET'])
+@jwt_required()
+def get(chip_id):
+    return find_theme(current_app, chip_id)
+
+
+@bp_theme.route('/', methods=['PUT'])
+@jwt_required()
 def update():
-    try:
-        data = request.get_json()
-        theme = validate_theme_schema.load(data=data)
+    data = request.get_json()
+    return update_theme(current_app, data)
 
-    except ValidationError as error:
-        # import ipdb;ipdb.set_trace()
-        fail = fail_creation_theme_schema.load({'errors': [erro for erro in error.args], 'message': "Fail Creation"})
-        return jsonify(fail), 301
-    except BadRequest as error:
-        fail = fail_creation_theme_schema.load(
-            {'error': [{'description': error.description}], 'message': "Fail Creation"})
-        return jsonify(fail), 400
 
-    try:
-        with current_app.app_context() as ctx:
-            ctx.app.db.session.add(theme)
-            ctx.app.db.session.commit()
-    except Exception as error:
-        with current_app.app_context() as ctx:
-            ctx.app.db.session.rollback()
-            ctx.app.db.session.commit()
-
-        fail = fail_creation_theme_schema.load(
-            {'errors': [{n_erro + 1: erro} for n_erro, erro in enumerate(error.orig.args)],
-             'message': "Fail Creation"}
-        )
-        return jsonify(fail), 500
+@bp_theme.route('/<board_id>', methods=['DELETE'])
+@jwt_required()
+def delete(board_id):
+    return delete_theme(current_app, board_id)

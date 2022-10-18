@@ -5,7 +5,7 @@ from .base_schemas import Success, Fail
 from ..model.chip import Chip
 
 
-class ChipsSchema(SQLAlchemySchema):
+class ChipSchema(SQLAlchemySchema):
     class Meta:
         # unknown = EXCLUDE
         model = Chip
@@ -16,7 +16,7 @@ class ChipsSchema(SQLAlchemySchema):
     url = fields.Str(required=True)
 
 
-class ValidateChipSchema(ChipsSchema):
+class ValidateChipSchema(ChipSchema):
     ...
 
 
@@ -50,3 +50,5 @@ class SuccessUpdateChipSchema(ValidateChipSchema):
 
 class FailUpdateChipSchema(Fail):
     ...
+
+
