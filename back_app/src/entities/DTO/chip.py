@@ -44,8 +44,8 @@ class FailGetChipSchema(Fail):
     ...
 
 
-class SuccessUpdateChipSchema(ValidateChipSchema):
-    ...
+class SuccessUpdateChipSchema(Success):
+    updated_id = fields.Integer(required=True)
 
 
 class FailUpdateChipSchema(Fail):

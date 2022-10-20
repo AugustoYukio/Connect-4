@@ -10,7 +10,7 @@ from back_app.factory import check_and_upgrade_all_tables
 # from back_app.factory import create_app
 
 
-@fixture()
+@fixture(scope='module')
 def app():
     from back_app.factory import create_app
     app = create_app('testing')[0]

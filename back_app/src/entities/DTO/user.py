@@ -94,11 +94,11 @@ class FailLoginUserSchema(Fail):
 class SuccessLoginUserSchema(Schema):
     token = fields.Str(required=True)
     refresh_token = fields.Str(required=True)
-    message = fields.Str(required=True)
+    message = fields.Str(dump_default='success', load_default='success')
 
 
 class SuccessDeleteUserSchema(Success):
-    ...
+    deleted_id = fields.Integer(required=True)
 
 
 class FailDeleteUserSchema(Fail):
@@ -106,7 +106,7 @@ class FailDeleteUserSchema(Fail):
 
 
 class SuccessUpdateUserSchema(UserSchema):
-    ...
+    updated_id = fields.Integer(required=True)
 
 
 class FailUpdateUserSchema(Fail):

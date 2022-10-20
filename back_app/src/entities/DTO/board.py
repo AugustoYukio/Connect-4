@@ -43,8 +43,8 @@ class FailDeleteBoardSchema(Fail):
     ...
 
 
-class SuccessUpdateBoardSchema(ValidateBoardSchema):
-    ...
+class SuccessUpdateBoardSchema(Success):
+    updated_id = fields.Integer(required=True)
 
 
 class FailUpdateBoardSchema(Fail):
