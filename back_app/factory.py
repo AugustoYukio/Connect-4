@@ -13,7 +13,7 @@ try:
     from .src.entities.model.theme import Theme
     from .src.entities.model.board import Board
     from .src.entities.model.chip import Chip
-    from .src.utils.messages import MSG_TOKEN_EXPIRED, MSG_INVALID_CREDENTIALS
+    from .src.utils.messages import MSG_TOKEN_EXPIRED, MSG_INVALID_CREDENTIALS, MSG_PERMISSION_DENIED
     from .src.entities.model import db
     from .src.entities.DTO import ma
     from .config import config
@@ -82,9 +82,8 @@ def configure_jwt(app):
     def my_unauthorized_callback(e):
         resp = jsonify({
             'status': 401,
-            'sub_status': 1,
             'description': e,
-            'message': MSG_INVALID_CREDENTIALS
+            'message': MSG_PERMISSION_DENIED
         })
 
         resp.status_code = 401
@@ -165,7 +164,7 @@ def check_and_upgrade_all_tables(app, directory=None):
         directory = os.path.join(app.root_path, app.extensions['migrate'].directory)
     # checa se o diretório migrations já foi inicializado
     if not (os.access(directory, os.F_OK) and os.listdir(directory)):
-        init()
+        init(directory=directory)
 
     stamp(directory=directory)
     migrate(directory=directory)

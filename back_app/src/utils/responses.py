@@ -103,13 +103,10 @@ def resp_ok(resource: str, message: str, data=None, **extras):
     return resp
 
 
-def resp_notallowed_user(resource: str, msg: str = MSG_PERMISSION_DENIED):
-    if not isinstance(resource, str):
-        raise ValueError('Recurso precisa ser uma string')
-
+def resp_notallowed_user(msg: str = MSG_PERMISSION_DENIED):
     resp = jsonify({
         'status': 401,
-        'resource': resource,
+
         'message': msg
     })
 

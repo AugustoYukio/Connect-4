@@ -9,7 +9,7 @@ except ImportError:
 class Theme(db.Model):
     __tablename__ = 'theme'
     id = Column(db.Integer, primary_key=True)
-    name = Column(db.String(50), nullable=False)
+    name = Column(db.String(50), nullable=False, unique=True)
     price = Column(db.Numeric(5, 2), nullable=False)
 
     chip1_id = Column(db.Integer, db.ForeignKey("chip.id"), nullable=False)
@@ -17,4 +17,5 @@ class Theme(db.Model):
     board_id = Column(db.Integer, db.ForeignKey("board.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    db.UniqueConstraint(chip1_id, chip2_id)
+    # db.CheckConstraint(chip1_id, chip2_id)
+    db.CheckConstraint('chip1_id != chip2_id', name='chips_in_themes_must_be_different')

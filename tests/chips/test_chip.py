@@ -64,4 +64,4 @@ def test_atualiza_um_chip_by_id(client, header_with_access_token, chip_db):
         url_for('bp_chip.update', _external=True), headers=header_with_access_token, data=payload
     )
     assert result.status_code == 202
-    assert result.json.get('id') is not None
+    assert result.json.get('updated_id') is not None

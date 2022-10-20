@@ -1,7 +1,6 @@
 from flask_marshmallow.sqla import auto_field, SQLAlchemyAutoSchema
 from marshmallow import fields
 from .base_schemas import Fail, Success
-from .chip import ChipSchema
 from ..model.theme import Theme
 
 
@@ -16,8 +15,8 @@ class ThemeSchema(SQLAlchemyAutoSchema):
     name = auto_field(required=True, )
     price = auto_field(required=True)
     chip1_id = auto_field(required=True)
-    chip2_id = auto_field(required=True)
-    board_id = auto_field(required=True)
+    chip2_id = fields.Integer(required=True)
+    board_id = fields.Integer(required=True)
 
 
 class ValidateThemeSchema(ThemeSchema):
@@ -25,7 +24,7 @@ class ValidateThemeSchema(ThemeSchema):
 
 
 class FailCreationThemeSchema(Fail):
-    message = fields.Str(default='Fail Creation User', required=True)
+    message = fields.Str(default='Fail Creation Theme')
 
 
 class SuccessCreateThemeSchema(Success):
@@ -48,8 +47,8 @@ class FailDeleteThemeSchema(Fail):
     ...
 
 
-class SuccessUpdateThemeSchema(ValidateThemeSchema):
-    ...
+class SuccessUpdateThemeSchema(Success):
+    updated_id = fields.Integer(required=True)
 
 
 class FailUpdateThemeSchema(Fail):

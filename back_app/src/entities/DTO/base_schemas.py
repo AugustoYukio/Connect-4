@@ -8,6 +8,6 @@ class Success(Schema):
 
 
 class Fail(Schema):
-    errors = fields.List(cls_or_instance=Union[fields.Dict], required=True)
-    message = fields.Str(dump_default='success', load_default='success')
+    errors = fields.Dict(cls_or_instance=fields.Str, required=True)
+    message = fields.Str(dump_default='fail', load_default='fail')
 
