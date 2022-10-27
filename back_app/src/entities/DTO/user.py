@@ -1,5 +1,6 @@
 from flask_marshmallow.sqla import SQLAlchemySchema
-from marshmallow import Schema, fields, validates_schema, ValidationError, validate, EXCLUDE
+from marshmallow import Schema, fields, validates_schema, ValidationError, EXCLUDE
+from marshmallow.validate import Email, Length, Range
 from marshmallow_sqlalchemy import auto_field
 
 from .base_schemas import Fail, Success
@@ -14,17 +15,17 @@ class UserSchema(SQLAlchemySchema):
         # include_fk = True
 
     id_ = fields.Integer(required=True, dump_only=True, attribute="id", data_key="id")
-    principal_email = auto_field()
-    username = auto_field()
-    secondary_email = auto_field()
-    password = fields.Str(load_only=True)
-    password_confirmation = fields.Str()
-    avatar_url = auto_field()
-    default_theme = auto_field()
-    admin = auto_field()
-    active = auto_field()
-    first_name = auto_field()
-    last_name = auto_field()
+    principal_email = auto_field(validate=[Email(), Length(min=10)], data_key='principalEmail')
+    username = auto_field(data_key='username')
+    secondary_email = auto_field(data_key='secondaryEmail')
+    password = fields.Str(load_only=True, validate=[Length(min=8, max=300)], data_key='password')
+    password_confirmation = fields.Str(validate=[Length(min=8, max=300)], data_key='passwordConfirmation')
+    avatar_url = auto_field(data_key='avatarUrl')
+    current_theme = auto_field(default=0, validate=[Range(min=0)], data_key='currentTheme')
+    admin = auto_field(data_key='admin'),
+    active = auto_field(data_key='active')
+    first_name = auto_field(data_key='firstName')
+    last_name = auto_field(data_key='lastName')
 
     @validates_schema
     def validate_password_and_password_confirmation(self, data, **kwargs):
@@ -43,6 +44,7 @@ class ValidateUserSchema(UserSchema):
         # unknown = EXCLUDE
         model = User
         load_instance = True
+        exclude = ('current_theme',)
 
 
 class ValidateUpdateUserSchema(SQLAlchemySchema):
@@ -55,7 +57,7 @@ class ValidateUpdateUserSchema(SQLAlchemySchema):
     username = auto_field(required=False)
     secondary_email = auto_field(required=False)
     avatar_url = auto_field(required=False)
-    default_theme = auto_field(required=False)
+    current_theme = auto_field(required=False)
     admin = auto_field(required=False)
     active = auto_field(required=False, load_default=True, dump_default=True)
     first_name = auto_field(required=False)
@@ -105,7 +107,7 @@ class FailDeleteUserSchema(Fail):
     ...
 
 
-class SuccessUpdateUserSchema(UserSchema):
+class SuccessUpdateUserSchema(Schema):
     updated_id = fields.Integer(required=True)
 
 

@@ -12,8 +12,8 @@ class ChipSchema(SQLAlchemySchema):
         load_instance = True
 
     id_ = fields.Integer(required=True, data_key="id", attribute='id', dump_only=True)
-    name = fields.Str(required=True)
-    url = fields.Str(required=True)
+    name = fields.Str(required=True, data_key="name")
+    url = fields.Str(required=True, data_key="url")
 
 
 class ValidateChipSchema(ChipSchema):

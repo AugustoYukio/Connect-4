@@ -16,5 +16,5 @@ MSG_RESOURCE_DELETED = '{} deletado(a).'
 
 MSG_TOKEN_CREATED = 'Token criado.'
 MSG_INVALID_CREDENTIALS = r'Invalid login and/or password'
-MSG_TOKEN_EXPIRED = 'Token expirou.'
+MSG_TOKEN_EXPIRED = 'Token expirou em {}'
 MSG_PERMISSION_DENIED = 'Permissão negada.'

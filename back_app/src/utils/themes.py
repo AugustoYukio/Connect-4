@@ -76,18 +76,17 @@ def update_theme(ctx_app, data):
     return success_update_theme_schema.dump({'updated_id': theme_id}), 202
 
 
-def find_theme(ctx_app, theme_id: str):
+def find_theme(theme_id: str):
     if not theme_id:
         return fail_get_theme_schema.load({'errors': [{1: 'theme_id must not be empty'}]})
     try:
-        clausule = Theme.id.is_(theme_id)
-        db_reponse = ctx_app.db.session.execute(select(Theme).where(clausule)).first()
-        if db_reponse is None:
+        theme = Theme.query.get(theme_id)
+        if theme is None:
             return fail_get_theme_schema.dump(
-                {'errors': [{1: 'Not Found'}], 'message': f'Theme id: {theme_id} not found'}
+                {'errors': {1: 'Not Found'}, 'message': f'Theme id: {theme_id} not found'}
             ), 200
-        found_theme = db_reponse[0]
-        return success_get_theme_schema.dump(found_theme), 200
+
+        return success_get_theme_schema.dump(theme), 200
     except ValidationError as error:
         fail = fail_get_theme_schema.load({'errors': [erro for erro in error.args], 'message': "Fail Creation"})
         return fail, 301

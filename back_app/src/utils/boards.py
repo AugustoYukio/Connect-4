@@ -1,7 +1,8 @@
-from sqlalchemy import insert
-
 from . import *
-from ..entities.DTO import *
+from ..entities.DTO import (
+    validate_board_schema, fail_creation_board_schema, fail_delete_board_schema, fail_update_board_schema,
+    fail_get_board_schema, success_get_board_schema, success_update_board_schema, success_delete_board_schema
+)
 from ..entities.model.board import Board
 
 
@@ -58,7 +59,6 @@ def update_board(ctx_app, data):
     if board_id is None:
         return fail_update_board_schema.load({'errors': {1: f"Board id must not empty."}}), 404
 
-    # _board = find_board(ctx_app, str(board_id))
     try:
         valid_data = validate_board_schema.dump(data)
     except ValidationError as error:
@@ -78,18 +78,16 @@ def update_board(ctx_app, data):
     return success_update_board_schema.dump({'updated_id': board_id}), 202
 
 
-def find_board(ctx_app, board_id: str):
+def find_board(board_id: str):
     if not board_id.strip():
         return fail_get_board_schema.load({'errors': {1: 'board_id must not be empty'}})
     try:
-        clausule = Board.id.is_(board_id)
-        db_reponse = ctx_app.db.session.execute(select(Board).where(clausule)).first()
-        if db_reponse is None:
+        board = Board.query.get(board_id)
+        if board is None:
             return fail_get_board_schema.dump(
                 {'errors': {1: 'Not Found'}, 'message': f'Board id: {board_id} not found'}
             ), 200
-        found_board = db_reponse[0]
-        return success_get_board_schema.dump(found_board), 200
+        return success_get_board_schema.dump(board), 200
     except ValidationError as error:
         fail = fail_get_board_schema.load({'errors': error.normalized_messages(), 'message': "Fail Creation"})
         return fail, 301

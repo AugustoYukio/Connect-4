@@ -1,5 +1,5 @@
 from flask_marshmallow import Marshmallow
-
+from marshmallow import ValidationError
 from .board import (ValidateBoardSchema, SuccessCreateBoardSchema, FailCreationBoardSchema, SuccessGetBoardSchema,
                     SuccessDeleteBoardSchema, FailGetBoardSchema, FailDeleteBoardSchema, FailUpdateBoardSchema,
                     SuccessUpdateBoardSchema, )
@@ -7,6 +7,12 @@ from .chip import (
     ValidateChipSchema, FailCreationChipSchema, FailDeleteChipSchema, SuccessCreateChipSchema,
     SuccessDeleteChipSchema, SuccessUpdateChipSchema, FailUpdateChipSchema, FailGetChipSchema,SuccessGetChipSchema
                    )
+from .inventory import (
+    ValidateInventorySchema, SuccessCreateInventorySchema, FailCreationInventorySchema, SuccessGetInventorySchema,
+    FailGetInventorySchema, SuccessDeleteInventorySchema, FailDeleteInventorySchema, SuccessUpdateInventorySchema,
+    FailUpdateInventorySchema
+)
+
 from .user import (
     ValidateUserSchema, InputLoginUserSchema, FailCreationUserSchema, FailLoginUserSchema,
     SuccessLoginUserSchema, SuccessGetUserSchema, FailGetUserSchema, SuccessDeleteUserSchema, FailDeleteUserSchema,
@@ -62,4 +68,15 @@ fail_delete_theme_schema = FailDeleteThemeSchema()
 success_update_theme_schema = SuccessUpdateThemeSchema()
 fail_update_theme_schema = FailUpdateThemeSchema()
 
+# INVENTORY SCHEMAS
+
+validate_inventory_schema = ValidateInventorySchema()
+success_create_inventory_schema = SuccessCreateInventorySchema()
+fail_creation_inventory_schema = FailCreationInventorySchema()
+success_get_inventory_schema = SuccessGetInventorySchema()
+fail_get_inventory_schema = FailGetInventorySchema()
+success_delete_inventory_schema = SuccessDeleteInventorySchema()
+fail_delete_inventory_schema = FailDeleteInventorySchema()
+success_update_inventory_schema = SuccessUpdateInventorySchema()
+fail_update_inventory_schema = FailUpdateInventorySchema()
 ma = Marshmallow()

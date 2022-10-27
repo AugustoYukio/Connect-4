@@ -31,7 +31,7 @@ def test_cria_novo_usuario(client, unauthenticated_headers, user_db):
         "last_name": "da Silvfa",
         "password": "#$@$#a1!@#3$%34*__s23da4sd6a1!@#sASDd6gdfm<M5as4d89a",
         "password_confirmation": "#$@$#a1!@#3$%34*__s23da4sd6a1!@#sASDd6gdfm<M5as4d89a",
-        "default_theme": 1,
+        "current_theme": 1,
         "active": True,
         "avatar_url": "https://cdn.pixabay.com/photo/2021/06/07/13/46/user-6318008_960_720.png"
     })
@@ -47,7 +47,7 @@ def test_deve_falhar_por_falta_de_username(client, unauthenticated_headers):
         "first_name": "Mafycon",
         "last_name": "da Silvfa",
         "password": "#$@$#a1!@#3$%34*__s23da4sd6a1!@#sASDd6gdfm<M5as4d89a",
-        "default_theme": 0,
+        "current_theme": 0,
         "active": True,
         "avatar_url": "https://cdn.pixabay.com/photo/2021/06/07/13/46/user-6318008_960_720.png"
     })
@@ -64,7 +64,7 @@ def test_deve_falhar_por_erro_no_db_constraint_unique(client, unauthenticated_he
         "first_name": "Mafycon",
         "last_name": "da Silvfa",
         "password": "#$@$#a1!@#3$%34*__s23da4sd6a1!@#sASDd6gdfm<M5as4d89a",
-        "default_theme": 1,
+        "current_theme": 1,
         "active": True,
         "avatar_url": "https://cdn.pixabay.com/photo/2021/06/07/13/46/user-6318008_960_720.png"
     }

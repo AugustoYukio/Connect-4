@@ -85,7 +85,7 @@ def update_chip(ctx_app, data):
     return success_update_chip_schema.load({'updated_id': chip_id}), 202
 
 
-def find_chip(ctx_app, chip_id: str):
+def find_chip(chip_id: str):
     if not chip_id:
         return fail_get_chip_schema.load({'errors': [{1: 'chip_id must not be empty'}]})
     try:

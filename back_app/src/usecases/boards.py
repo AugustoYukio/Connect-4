@@ -1,6 +1,6 @@
 
 from . import (Blueprint, jwt_required, current_app, request, get_jwt, jsonify, resp_notallowed_user, admin_required)
-from back_app.src.utils.boards import create_board, find_board, update_board, delete_board
+from ..utils.boards import create_board, find_board, update_board, delete_board
 
 bp_board = Blueprint('bp_board', __name__, url_prefix='/board')
 
@@ -17,7 +17,7 @@ def create():
 @bp_board.route('/<chip_id>', methods=['GET'])
 @jwt_required()
 def get(chip_id):
-    return find_board(current_app, chip_id)
+    return find_board(chip_id)
 
 
 @bp_board.route('/', methods=['PUT'])

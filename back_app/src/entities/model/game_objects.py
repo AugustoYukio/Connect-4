@@ -1,14 +1,13 @@
 from __future__ import annotations
-
 import secrets
 from random import randint
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Type, Tuple
-from ..Interfaces.game_pieces import (
-    IPosition, ISlot, IGrid, IPlayerChecker, IBoard, IRow, IColumn, IScore, IPlayer, IGame, IStatusGame,
-    IStatusPosition)
 
+from back_app.src.entities.interfaces.game_pieces import (
+    IPosition, ISlot, IGrid, IPlayerChecker, IBoard, IRow, IColumn, IScore, IPlayer, IGame, IStatusGame, IStatusPosition
+)
 
 THE_PRINCIPAL_NUMBER = 4
 
@@ -178,18 +177,59 @@ class Grid(IGrid):
         rows_for_diagonal = zip(range(inferior_x, superior_x + 1), range(inferior_y, superior_y + 1))
         return [self.slots[p_x][p_y] for p_x, p_y in rows_for_diagonal]
 
-    def __get_slots_by_horizontal(self, row: Row):
-        return self.slots[row.number]
+    def __get_slots_by_diagonal_2(self, position: Type[IPosition]) -> List[ISlot] | None:
+        # e = self.__get_slots_by_diagonal_1(position)
+        """Superior esquerdo para inferior direito."""
+        BOTTOM_END_OF_ROWS, BOTTOM_END_OF_COLUMNS = 0, 0
 
-    def __get_slots_by_vertical(self, column: Type[IColumn]):
-        return [row[column.number] for row in self.slots]
+        # inferior_x, inferior_y = position.value
+        position_x, position_y = position.value
+
+        while position_x < (self.ROWS - 1) and position_y > BOTTOM_END_OF_COLUMNS:
+            position_x += 1
+            position_y -= 1
+        left_y = position_y
+        left_x = position_x
+
+        position_x, position_y = position.value
+
+        while position_y < self.COLUMNS-1 and position_x > BOTTOM_END_OF_ROWS:
+            position_x -= 1
+            position_y += 1
+        right_y = position_y
+        right_x = position_x
+        print(grid)
+        print(f'Limite Superior Esquerdo: {(left_x, left_y,)}')
+        print(f'Posição Inserida: {position.value}')
+        print(f'Limite Inferior Direito: {(right_x, right_y,)}')
+        rows_for_diagonal = zip(range(left_x, right_x - 1, -1), range(left_y, right_y + 1))
+        print([self.slots[p_x][p_y] for p_x, p_y in rows_for_diagonal])
+        if (left_x + 1 - right_x) < THE_PRINCIPAL_NUMBER or (right_y + 1 - left_y) < THE_PRINCIPAL_NUMBER:
+            """Caso a diagonal formada não tenha ao menos 4 slots"""
+            return None
+
+        rows_for_diagonal = zip(range(left_x, right_x-1, -1), range(left_y, right_y+1))
+        return [self.slots[p_x][p_y] for p_x, p_y in rows_for_diagonal]
+
+    def __get_slots_by_horizontal(self, row: Type[IRow], filter_by=StatusPosition.EMPTY):
+        return [slot for slot in self.slots[row.number] if filter_by == slot.position.status]
+
+    def __get_slots_by_vertical(self, column: Type[IColumn], filter_by=StatusPosition.EMPTY):
+        return [row[column.number] for row in self.slots if filter_by == row[column.number].position.status]
 
     def get_all_directions_slots(self, position: Type[IPosition]) -> List[List[ISlot]]:
         # print(position)
-        results = [func(parameter) for (func, parameter) in zip(
-            (self.__get_slots_by_diagonal_1, self.__get_slots_by_vertical, self.__get_slots_by_horizontal),
-            (position, position.column, position.row))
-                   ]
+        results = [
+            func(parameter) for (func, parameter) in zip(
+                (self.__get_slots_by_diagonal_1, self.__get_slots_by_diagonal_2), (position, position,))
+        ]
+
+        results.extend([
+            func(parameter, StatusPosition.FULL) for (func, parameter) in zip(
+                (self.__get_slots_by_vertical, self.__get_slots_by_horizontal), (position.column, position.row)
+            )
+        ]
+        )
 
         return results
 
@@ -252,25 +292,26 @@ class StatusGame(IStatusGame, Enum):
     STOPPED = 'STOPPED'
 
 
-def __is_connected_for_4(rows: List[ISlot]) -> Tuple[bool, List[Type[ISlot]]]:
-    # TODO: Tornar função agnóstica em relação ao jogador
+def __segment_checker(segment: List[ISlot]) -> tuple[ISlot, ISlot] | None:
+    qtd_in_seq = 0
+    for slot in segment[1:]:
+        if slot.position.status == StatusPosition.EMPTY:
+            qtd_in_seq = 0
+        elif segment[0].player_checker == slot.player_checker:
+            qtd_in_seq += 1
+            if qtd_in_seq == THE_PRINCIPAL_NUMBER - 1:
+                return segment[0], slot,
+    return
 
-    CONDITION_TO_VICTORY = THE_PRINCIPAL_NUMBER * 'p1'
-    N = len(rows)
 
-    # A loop to slide pat[] one by one
-    for i in range(N - M + 1):
+def __is_connected_for_4(rows: List[ISlot]) -> tuple[ISlot, ISlot] | None:
+    check = None
+    for row in rows:
+        check = __segment_checker(row)
+        if check is not None:
+            break
 
-        # For current index i,
-        # check for pattern match
-        for j in range(M):
-            if s2[i + j] != s1[j]:
-                break
-
-        if j + 1 == M:
-            return i
-
-    return -1
+    return check
 
 
 @dataclass
@@ -295,7 +336,7 @@ class Game(IGame):
 
     def move(self, column_number: int):
         self.__board.set_player_checker_for_turn(self.__player_in_turn)
-        self.__board.do_movement(Column(column_number))
+        self.__board.insert_in_column(Column(column_number))
 
     def __status_init_game(self) -> bool:
         if self.__player_2 is None:
@@ -337,14 +378,29 @@ class GameRoom:
         self.game.move(move)
 
 
-# Driver Code
+# threads = list()
+# for i in range(0, 1000000, 1000):
+#     thread = Thread(target=add_items, args=(shared_dict, i, 1000))
+#     threads.append(thread)
+
 if __name__ == "__main__":
     game_room = GameRoom(secrets.token_urlsafe(5))
     game_room.start_new_game(secrets.token_urlsafe(5))
     game_room.do_movement(4)
-    # grid = Grid()
-    # grid.put_checker_in_slot(Player(2), Column(3))
-    # print(grid)
+    game_room.game.get_current_player()
+    grid = Grid()
+    p = grid.put_checker_in_slot(Player(1), Column(2))
+    p = grid.put_checker_in_slot(Player(1), Column(1))
+    p = grid.put_checker_in_slot(Player(1), Column(3))
+    p = grid.put_checker_in_slot(Player(1), Column(3))
+    p = grid.put_checker_in_slot(Player(1), Column(0))
+    p = grid.put_checker_in_slot(Player(1), Column(0))
+    p = grid.put_checker_in_slot(Player(1), Column(0))
+    p = grid.put_checker_in_slot(Player(1), Column(0))
+    # p = grid.put_checker_in_slot(Player(2), Column(3))
+    e = grid.get_all_directions_slots(p)
+    print(grid)
+    win = __is_connected_for_4(e)
     # p1 = Player(secrets.token_urlsafe(5))
     # game = Game(p1)
 

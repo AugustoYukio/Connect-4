@@ -12,11 +12,12 @@ class ThemeSchema(SQLAlchemyAutoSchema):
         # include_fk = True
         load_relationships = True
 
-    name = auto_field(required=True, )
-    price = auto_field(required=True)
-    chip1_id = auto_field(required=True)
-    chip2_id = fields.Integer(required=True)
-    board_id = fields.Integer(required=True)
+    name = auto_field(required=True, data_key='name')
+    price = auto_field(required=True, data_key='price')
+    chip1_id = auto_field(required=True, data_key='chip1Id')
+    chip2_id = fields.Integer(required=True, data_key='chip2Id')
+    board_id = fields.Integer(required=True, data_key='boardId')
+    image = fields.Str(required=True, data_key='themeImage')
 
 
 class ValidateThemeSchema(ThemeSchema):

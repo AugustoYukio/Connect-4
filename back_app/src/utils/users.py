@@ -7,6 +7,7 @@ from ..entities.DTO import (
     fail_delete_user_schema, fail_update_user_schema, validate_update_user_schema, success_update_user_schema,
     success_delete_user_schema, success_get_user_schema, success_login_user_schema
 )
+from ..entities.model.inventory import Inventory
 
 from ..entities.model.user import User
 from .messages import MSG_INVALID_CREDENTIALS
@@ -26,7 +27,6 @@ def create_user(ctx_app, data):
         user.gen_hash()
     except ValidationError as error:
         return fail_creation_user_schema.load({'errors': error.normalized_messages()}), 301
-
     try:
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.add(user)
@@ -35,6 +35,9 @@ def create_user(ctx_app, data):
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.rollback()
         return fail_creation_user_schema.load({'errors': {"IntegrityError": error.orig.args}}), 400
+    with ctx_app.app_context() as ctx:
+        ctx.app.db.session.add(Inventory(user_id=user.id, theme_id=user.current_theme))
+        ctx.app.db.session.commit()
 
     return make_login_response(user), 201
 
@@ -59,8 +62,11 @@ def authenticate(data):
     }), 401
 
 
-def find_user(ctx_app, user_id, only_active=True):
-    # import ipdb;ipdb.set_trace()
+def get_count_of_admin_users():
+    return User.query.filter(User.admin.is_(True)).count()
+
+
+def find_user(user_id, only_active=True):
     if not user_id:
         return fail_get_user_schema.load({'errors': {1: 'user_id must not be empty'}, 'message': "Fail"})
     try:
@@ -84,7 +90,9 @@ def delete_user(ctx_app, user_id, force_delete=False):
         ), 404
     if not force_delete:
         resut_update = update_user(ctx_app, {'id': user_id, 'active': False}, return_id_only=True)
-        return success_delete_user_schema.load({'deleted_id': resut_update}), 202
+        if resut_update.get('errors', False):
+            return fail_delete_user_schema.load({'message': 'Fail Delete', 'errors': resut_update.get('errors')}), 404
+        return success_delete_user_schema.load({'deleted_id': resut_update.get('id')}), 202
     try:
         stmt = delete(User).where(User.id == user_id)
         affected_rows = ctx_app.db.session.execute(stmt)
@@ -114,11 +122,13 @@ def update_user(ctx_app, data, return_id_only=False):
         stmt = update(User).where(User.id == user_id).values(**valid_data)
         affected_rows = ctx_app.db.session.execute(stmt)
         if affected_rows.rowcount == 0:
+            if return_id_only:
+                return fail_update_user_schema.load({'errors': {1: f"User id: {user_id} not found"}})
             return fail_update_user_schema.load({'errors': {1: f"User id: {user_id} not found"}}), 404
     except (IntegrityError,) as error:
         return fail_creation_user_schema.load({'errors': {"IntegrityError": error.orig.args}}), 400
     else:
         ctx_app.db.session.commit()
     if return_id_only:
-        return user_id
+        return {'id': user_id}
     return success_update_user_schema.load({'updated_id': user_id}), 202

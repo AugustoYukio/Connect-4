@@ -1,37 +1,4 @@
-import os
-
-import ipdb
-from flask import Flask, jsonify
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
-from flask_migrate import Migrate, upgrade, migrate, init, stamp
-from flask_socketio import SocketIO
-from flask_cors import CORS
-
-try:
-    from .src.entities.model.user import User
-    from .src.entities.model.theme import Theme
-    from .src.entities.model.board import Board
-    from .src.entities.model.chip import Chip
-    from .src.utils.messages import MSG_TOKEN_EXPIRED, MSG_INVALID_CREDENTIALS, MSG_PERMISSION_DENIED
-    from .src.entities.model import db
-    from .src.entities.DTO import ma
-    from .config import config
-except ImportError:
-    from src.entities.model.user import User
-    from src.entities.model.theme import Theme
-    from src.entities.model.board import Board
-    from src.entities.model.chip import Chip
-    from src.utils.messages import MSG_TOKEN_EXPIRED, MSG_INVALID_CREDENTIALS
-    from src.entities.model import db
-    from src.entities.DTO import ma
-    from config import config
-
-migration = Migrate()
-
-bcrypt_flask = Bcrypt()
-
-cors = CORS()
+from . import *
 
 
 def config_db(app):
@@ -60,26 +27,17 @@ def configure_jwt(app):
         # novos campos: active, roles, full_name e etc...
 
         if user:
-            return {
-                'username': user.username,
-                'is_active': user.active,
-                'is_admin': user.admin
-            }
+            return {'username': user.username, 'is_active': user.active, 'is_admin': user.admin}
 
     @jwt.expired_token_loader
-    def my_expired_token_callback():
-        resp = jsonify({
-            'status': 401,
-            'sub_status': 42,
-            'message': MSG_TOKEN_EXPIRED
-        })
-
-        resp.status_code = 401
-
-        return resp
+    def expired_token_callback(jwt_header, jwt_payload):
+        return jsonify(
+            status=401,
+            message=MSG_TOKEN_EXPIRED.format(datetime.utcfromtimestamp(jwt_payload.get('iat')))
+        ), 401
 
     @jwt.unauthorized_loader
-    def my_unauthorized_callback(e):
+    def unauthorized_callback(e):
         resp = jsonify({
             'status': 401,
             'description': e,
@@ -136,6 +94,12 @@ def configure_blueprint(app):
     except ImportError:
         from src.usecases.boards import bp_board
     app.register_blueprint(bp_board)
+
+    try:
+        from .src.usecases.inventory import bp_inventory
+    except ImportError:
+        from src.usecases.inventory import bp_inventory
+    app.register_blueprint(bp_inventory)
 
 
 def create_app(config_name=os.getenv('FLASK_ENV'), name='back_app'):

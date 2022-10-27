@@ -1,5 +1,5 @@
 from . import (Blueprint, jwt_required, request, current_app, admin_required)
-from back_app.src.utils.chips import (create_chip, delete_chip, update_chip, find_chip)
+from ..utils.chips import (create_chip, delete_chip, update_chip, find_chip)
 
 bp_chip = Blueprint('bp_chip', __name__, url_prefix='/chip')
 
@@ -14,7 +14,7 @@ def create():
 @bp_chip.route('/<chip_id>', methods=['GET'])
 @jwt_required()
 def get(chip_id):
-    return find_chip(current_app, chip_id)
+    return find_chip(chip_id)
 
 
 @bp_chip.route('/', methods=['PUT'])
