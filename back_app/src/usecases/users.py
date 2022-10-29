@@ -1,5 +1,9 @@
-from . import (Blueprint, request, current_app, jwt_required, jsonify, get_jwt_identity, get_jwt, resp_notallowed_user)
-from ..utils.users import create_user, authenticate, find_user, delete_user, update_user, get_count_of_admin_users
+from . import (
+    Blueprint, request, current_app, jwt_required, jsonify, get_jwt_identity, get_jwt, resp_notallowed_user,
+    owner_required
+)
+from ..utils.users import (create_user, authenticate, find_user, delete_user, update_user, get_count_of_admin_users)
+from ..utils.inventory import find_inventory_item, find_all_inventories_items_by_user_id
 
 bp_user = Blueprint('bp_user', __name__, url_prefix='/user')
 
@@ -74,3 +78,15 @@ def udpate():
 def login():
     data = request.get_json()
     return authenticate(data)
+
+
+@bp_user.route('/inventory', methods=['GET'])
+@owner_required()
+def get_user_inventory(user_id):
+    args = request.args
+    page = args.get('p', default=1, type=int)
+    per_page = args.get('per_p', default=25, type=int)
+    result = find_all_inventories_items_by_user_id(user_id, page, per_page)
+
+    response = jsonify(result)
+    return response

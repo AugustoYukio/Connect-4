@@ -1,5 +1,6 @@
 from . import *
 from .chips import find_chip, find_chips
+from .inventory import find_all_inventories_items_by_user_id, get_all_inventories
 from ..entities.DTO import (validate_theme_schema, fail_creation_theme_schema, fail_delete_theme_schema,
                             success_delete_theme_schema, fail_update_theme_schema, success_update_theme_schema,
                             fail_get_theme_schema, success_get_theme_schema, validate_chip_schema)
@@ -90,3 +91,26 @@ def find_theme(theme_id: str):
     except ValidationError as error:
         fail = fail_get_theme_schema.load({'errors': [erro for erro in error.args], 'message': "Fail Creation"})
         return fail, 301
+
+
+def find_themes_by_user(user_id, page=1, per_page=25):
+    user_inventory_items = get_all_inventories(user_id)
+    per_page = min(25, per_page)
+    theme_paginate = Theme.query.order_by(Theme.name.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    items = success_get_theme_schema.dump(theme_paginate.items, many=True)
+    ids_for_themes_user_owner = [inventory_item['themeId'] for inventory_item in user_inventory_items]
+
+
+    for item in items:
+        item["status"] = "unavailable" if item['id'] in ids_for_themes_user_owner else "available"
+
+    return {
+        'page': page,
+        'perPage': per_page,
+        'hasNext': theme_paginate.has_next,
+        'hasPrev': theme_paginate.has_prev,
+        'pageList': [inventory_page if inventory_page else '...' for inventory_page in theme_paginate.iter_pages()],
+        'count': theme_paginate.total,
+        'items': items
+        }

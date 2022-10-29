@@ -1,14 +1,12 @@
 from datetime import timedelta
-from . import *
 from flask_jwt_extended import create_access_token, create_refresh_token
 from . import *
+from .inventory import find_inventory_item, create_inventory_item
 from ..entities.DTO import (
     fail_get_user_schema, validate_user_schema, fail_creation_user_schema, input_login_user_schema,
     fail_delete_user_schema, fail_update_user_schema, validate_update_user_schema, success_update_user_schema,
     success_delete_user_schema, success_get_user_schema, success_login_user_schema
 )
-from ..entities.model.inventory import Inventory
-
 from ..entities.model.user import User
 from .messages import MSG_INVALID_CREDENTIALS
 
@@ -21,6 +19,9 @@ def make_login_response(user: User) -> dict:
     # return success_login_user_schema.load({'token': acess_token, 'refresh_token': refresh_token, 'message': 'success'}
 
 
+
+
+
 def create_user(ctx_app, data):
     try:
         user = validate_user_schema.load(data=data)
@@ -31,13 +32,11 @@ def create_user(ctx_app, data):
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.add(user)
             ctx.app.db.session.commit()
+            create_inventory_item(ctx_app, user.id, user.current_theme)
     except (IntegrityError,) as error:
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.rollback()
         return fail_creation_user_schema.load({'errors': {"IntegrityError": error.orig.args}}), 400
-    with ctx_app.app_context() as ctx:
-        ctx.app.db.session.add(Inventory(user_id=user.id, theme_id=user.current_theme))
-        ctx.app.db.session.commit()
 
     return make_login_response(user), 201
 

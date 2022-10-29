@@ -28,6 +28,7 @@ def find_inventory_item(theme_id, user_id):
 
 
 def find_all_inventories_items_by_user_id(user_id, page=1, per_page=25):
+    per_page = min(25, per_page)
     inventory = Inventory.query.where(
         Inventory.user_id.is_(user_id)
     ).order_by(Inventory.theme_id.desc()).paginate(page=page, per_page=per_page, error_out=False)
@@ -39,8 +40,15 @@ def find_all_inventories_items_by_user_id(user_id, page=1, per_page=25):
         'pageList': [inventory_page if inventory_page else '...' for inventory_page in inventory.iter_pages()],
         'count': inventory.total,
         'items': success_get_inventory_schema.dump(inventory.items, many=True)
-        }
+    }
+
+
+def get_all_inventories(user_id):
+    inventory = Inventory.query.with_entities(Inventory.theme_id).where(Inventory.user_id.is_(user_id))
+    return success_get_inventory_schema.dump(inventory, many=True)
 
 
 def create_inventory_item(current_app, user_id, theme_id):
-    pass
+    with current_app.app_context() as ctx:
+        ctx.app.db.session.add(Inventory(user_id=user_id, theme_id=theme_id))
+        ctx.app.db.session.commit()
