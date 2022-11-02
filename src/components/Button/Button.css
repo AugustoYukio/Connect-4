@@ -9,3 +9,7 @@
   border: none;
   border-radius: 10px;
 }
+
+.Button:active {
+  background-color: var(--blue);
+}

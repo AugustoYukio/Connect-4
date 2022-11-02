@@ -1,0 +1,22 @@
+.Shop {
+  padding: 20px;
+
+  background-color: var(--dark-blue);
+  height: 100vh;
+
+  overflow: auto;
+}
+
+.ShopTitle {
+  color: var(--white);
+  text-align: center;
+
+  font-size: 3.2rem;
+  margin: 30px 0;
+}
+
+.ShopItemContainer {
+  padding: 20px 30px;
+  justify-content: center;
+  gap: 30px;
+}

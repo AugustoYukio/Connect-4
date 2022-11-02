@@ -13,6 +13,7 @@ export default () => {
             <h1 className="MenuTitle my-5">Connect 4</h1>
             <GameMenu>
                 <GameMenuOption urlTo={`${path}game`} label="Jogar" />
+                <GameMenuOption urlTo={`${path}shop`} label="Loja" />
                 <GameMenuOption urlTo={`${path}admin`} label="Painel de Administrador" />
                 <GameMenuOption isButton label="Sair" />
             </GameMenu>

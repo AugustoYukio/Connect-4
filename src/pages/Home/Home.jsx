@@ -5,6 +5,7 @@ import Menu from "../Menu/Menu"
 import Admin from "../Admin/Admin"
 import User from "../../components/User/User";
 import { Route, useRouteMatch } from 'react-router-dom';
+import Shop from "../Shop/Shop";
 
 export default () => {
     const { path, url } = useRouteMatch();
@@ -17,6 +18,9 @@ export default () => {
             </Route>
             <Route path={`${path}/game`}>
                 <Game />
+            </Route>
+            <Route path={`${path}/shop`}>
+                <Shop />
             </Route>
             <Route path={`${path}/admin`}>
                 <Admin />

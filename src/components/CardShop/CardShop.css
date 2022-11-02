@@ -1,0 +1,40 @@
+.CardShop {
+  width: 20rem;
+  border: none;
+  border-radius: 20px;
+}
+
+.CardShopBody {
+  background-color: var(--mint);
+}
+
+.CardShopDesc {
+  color: var(--dark-blue);
+  background-color: var(--mint);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.CardShopDetails {
+  overflow: hidden;
+}
+
+.CardShopBuyButton {
+  background-color: var(--blue);
+  color: var(--mint);
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.CardShopBuyButton:hover {
+  background-color: var(--mint);
+  color: var(--blue);
+}
+
+.CardShopPrice {
+  color: green;
+  font-size: 1.2rem;
+}
