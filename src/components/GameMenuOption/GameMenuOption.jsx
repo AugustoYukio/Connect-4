@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 
 import "./GameMenuOption.css";
 
-export default ({ isButton = false, urlTo, label, onLogout, ...props }) => {
+export default ({ isButton = false, urlTo, label, onLogout, show, ...props }) => {
     return (
-        <div className="GameMenuOptionWrapper">
+        <div className="GameMenuOptionWrapper" hidden = {show == null ? false : show} >
             <img className="GameMenuOptionImg mr-3" src={require("../../res/img/spinningchip.gif")} />
             {
                 isButton ?

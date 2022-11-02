@@ -19,7 +19,7 @@ function App() {
             <SignUp />
           </Route>
           <Route path="*">
-            <Redirect to="/home" />
+            <Redirect to="/signin" />
           </Route>
         </Switch>
       </div>

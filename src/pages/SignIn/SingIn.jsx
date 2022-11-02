@@ -55,7 +55,6 @@ export default () => {
         
         let xhttp = new XMLHttpRequest();
         xhttp.open("POST", "http://127.0.0.1:5000/user/login", false);
-        xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.send(JSON.stringify({"username": user, "password": password}));
         
@@ -63,7 +62,6 @@ export default () => {
             var json_response = JSON.parse(xhttp.responseText);
             var parsedJwt = parseJwt(json_response.token);
             setCookie('token', json_response.token, { path: '/' });
-            setCookie('userName', user, { path: '/' });
             setCookie('userID', parsedJwt.sub, { path: '/' });
             return true;
         }
