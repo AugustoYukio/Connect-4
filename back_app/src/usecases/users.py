@@ -84,8 +84,8 @@ def login():
 @owner_required()
 def get_user_inventory(user_id):
     args = request.args
-    page = args.get('p', default=1, type=int)
-    per_page = args.get('per_p', default=25, type=int)
+    page = args.get('page', default=1, type=int)
+    per_page = min(25, args.get('per_p', default=25, type=int))
     result = find_all_inventories_items_by_user_id(user_id, page, per_page)
 
     response = jsonify(result)

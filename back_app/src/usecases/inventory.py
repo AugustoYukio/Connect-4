@@ -8,7 +8,7 @@ bp_inventory = Blueprint('bp_inventory', __name__, url_prefix='/inventory')
 @bp_inventory.route('/', methods=['POST'])
 @admin_required()
 def create(user_id=None, theme_id=None):
-    data = request.get_json()
+    # data = request.get_json()
     return create_inventory_item(current_app, user_id, theme_id)
 
 

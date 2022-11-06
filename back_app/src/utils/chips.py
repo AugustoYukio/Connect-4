@@ -23,15 +23,11 @@ def create_chip(ctx_app, data):
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.add(chip)
             ctx.app.db.session.commit()
-    except Exception as error:
+    except (IntegrityError, ) as error:
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.rollback()
             ctx.app.db.session.commit()
-
-        fail = fail_creation_chip_schema.load(
-            {'errors': [{n_erro + 1: erro} for n_erro, erro in enumerate(error.orig.args)],
-             'message': "Fail Creation Chip"}
-        )
+        fail = fail_creation_chip_schema.load({'errors': {1: error.orig.args[0]}, 'message': "Fail Creation Chip"})
         return jsonify(fail), 400
 
     else:
@@ -116,3 +112,21 @@ def find_chips(ctx_app, chip_ids: []):
     except ValidationError as error:
         fail = fail_get_chip_schema.load({'errors': [erro for erro in error.args], 'message': "Fail"})
         return fail
+
+
+def find_all_chip(page=1, per_page=25):
+    board_paginate = Chip.query.order_by(Chip.name.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    items = success_get_chip_schema.dump(board_paginate.items, many=True)
+
+    return {
+        'page': page,
+        'perPage': per_page,
+        'hasNext': board_paginate.has_next,
+        'hasPrev': board_paginate.has_prev,
+        'pageList': [board_page if board_page else '...' for board_page in board_paginate.iter_pages()],
+        'count': board_paginate.total,
+        'items': items
+    }
+
+

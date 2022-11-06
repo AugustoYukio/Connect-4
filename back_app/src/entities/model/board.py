@@ -1,5 +1,4 @@
 import os
-
 from sqlalchemy import Column, DateTime, CheckConstraint, func, event
 
 try:
@@ -22,3 +21,5 @@ class Board(db.Model):
 def insert_default_board(*args, **kwargs):
     db.session.add(Board(id=0, name=r'default', url=os.getenv('DEFAULT_BOARD_URL', 'DEFAULT_BOARD_URL')))
     db.session.commit()
+
+

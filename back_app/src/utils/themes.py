@@ -1,20 +1,13 @@
 from . import *
-from .chips import find_chip, find_chips
-from .inventory import find_all_inventories_items_by_user_id, get_all_inventories
+from .inventory import get_all_inventories
 from ..entities.DTO import (validate_theme_schema, fail_creation_theme_schema, fail_delete_theme_schema,
                             success_delete_theme_schema, fail_update_theme_schema, success_update_theme_schema,
-                            fail_get_theme_schema, success_get_theme_schema, validate_chip_schema)
-from ..entities.model.chip import Chip
+                            fail_get_theme_schema, success_get_theme_schema)
 from ..entities.model.theme import Theme
 
 
 def create_theme(ctx_app, data):
     try:
-        # validate_chip_schema.load()
-        #        chips = find_chips(ctx_app, [data.get('chip1_id'), data.get('chip2_id')])
-        #        if chips.get('errors') is not None:
-        #            raise ValidationError(chips)
-
         theme = validate_theme_schema.load(data=data)
 
     except ValidationError as error:
@@ -23,6 +16,7 @@ def create_theme(ctx_app, data):
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.add(theme)
             ctx.app.db.session.commit()
+            ctx.app.db.session.refresh(theme)
     except IntegrityError as error:
         with ctx_app.app_context() as ctx:
             ctx.app.db.session.rollback()
@@ -30,7 +24,7 @@ def create_theme(ctx_app, data):
             {'errors': {"IntegrityError": error.orig.args}, 'message': "Fail Creation Theme"}
         ), 400
     else:
-        return validate_theme_schema.load(theme), 201
+        return success_get_theme_schema.dump(theme), 201
 
 
 def delete_theme(ctx_app, theme_id):
@@ -89,7 +83,7 @@ def find_theme(theme_id: str):
 
         return success_get_theme_schema.dump(theme), 200
     except ValidationError as error:
-        fail = fail_get_theme_schema.load({'errors': [erro for erro in error.args], 'message': "Fail Creation"})
+        fail = fail_get_theme_schema.load({'errors': [erro for erro in error.args], 'message': "Fail"})
         return fail, 301
 
 
@@ -100,7 +94,6 @@ def find_themes_by_user(user_id, page=1, per_page=25):
 
     items = success_get_theme_schema.dump(theme_paginate.items, many=True)
     ids_for_themes_user_owner = [inventory_item['themeId'] for inventory_item in user_inventory_items]
-
 
     for item in items:
         item["status"] = "unavailable" if item['id'] in ids_for_themes_user_owner else "available"
@@ -113,4 +106,4 @@ def find_themes_by_user(user_id, page=1, per_page=25):
         'pageList': [inventory_page if inventory_page else '...' for inventory_page in theme_paginate.iter_pages()],
         'count': theme_paginate.total,
         'items': items
-        }
+    }

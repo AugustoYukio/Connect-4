@@ -6,6 +6,22 @@ from ..entities.DTO import (
 from ..entities.model.board import Board
 
 
+def find_all_board(page=1, per_page=25):
+    board_paginate = Board.query.order_by(Board.name.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    items = success_get_board_schema.dump(board_paginate.items, many=True)
+
+    return {
+        'page': page,
+        'perPage': per_page,
+        'hasNext': board_paginate.has_next,
+        'hasPrev': board_paginate.has_prev,
+        'pageList': [board_page if board_page else '...' for board_page in board_paginate.iter_pages()],
+        'count': board_paginate.total,
+        'items': items
+    }
+
+
 def create_board(ctx_app, data):
     try:
         board = validate_board_schema.load(data=data)
@@ -22,8 +38,10 @@ def create_board(ctx_app, data):
             ctx.app.db.session.commit()
 
         fail = fail_creation_board_schema.load(
-            {'errors': [{n_erro + 1: erro} for n_erro, erro in enumerate(error.orig.args)],
-             'message': "Fail Creation Board"}
+            {
+                'errors': {n_erro + 1: erro for n_erro, erro in enumerate(error.orig.args)},
+                'message': "Fail Creation Board"
+            }
         )
         return fail, 400
 
@@ -32,7 +50,6 @@ def create_board(ctx_app, data):
 
 
 def delete_board(ctx_app, board_id):
-
     if not board_id:
         return fail_delete_board_schema.load(
             {'message': 'Fail Delete', 'errors': {1: f"Board id must not empty."}}), 404
