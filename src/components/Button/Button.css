@@ -13,3 +13,8 @@
 .Button:active {
   background-color: var(--blue);
 }
+
+.Button.reverseColors {
+  background-color: var(--mint);
+  color: var(--dark-blue);
+}

@@ -1,0 +1,31 @@
+.CardGameRoom {
+  background-color: var(--mint);
+  border-radius: 15px;
+  padding: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 10px;
+}
+
+.GameRoomName {
+  width: 350px;
+}
+
+.GameRoomInfoLabel {
+  color: var(--gray);
+  font-size: 0.8rem;
+  margin-bottom: 0;
+}
+
+.GameRoomTitle {
+  color: var(--dark-blue);
+}
+
+.GameRoomPlayerCount {
+  color: green;
+  font-weight: 700;
+  font-size: 1.4rem;
+}

@@ -1,6 +1,7 @@
 import React from "react";
 import './Home.css';
 import Game from "../Game/Game"
+import GameList from "../GameList/GameList";
 import Menu from "../Menu/Menu"
 import Admin from "../Admin/Admin"
 import User from "../../components/User/User";
@@ -18,6 +19,9 @@ export default () => {
             </Route>
             <Route path={`${path}/game`}>
                 <Game />
+            </Route>
+            <Route path={`${path}/gamelist`}>
+                <GameList />
             </Route>
             <Route path={`${path}/shop`}>
                 <Shop />
