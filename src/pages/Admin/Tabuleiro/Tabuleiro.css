@@ -1,0 +1,12 @@
+.Tabuleiro {
+  font-size: 1.25rem;
+  background-color: white;
+}
+
+.TabuleiroContainer {
+  margin-top: 50px;
+}
+
+.TabuleiroButton {
+  font-family: "Open Sans", sans-serif;
+}

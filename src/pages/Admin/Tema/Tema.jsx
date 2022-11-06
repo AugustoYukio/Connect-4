@@ -1,8 +1,74 @@
-import React from "react";
+import React  from "react";
 import './Tema.css'
+import { useCookies } from "react-cookie";
+import Swal from 'sweetalert2'
+import AdminTable from '../../../components/AdminTable/AdminTable'
+
 
 export default () => {
-/*
+    const [cookies] = useCookies();
+    var themesArray = new Array();
+
+    function loadTable() {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://127.0.0.1:5000/theme/", false);
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send();
+        if(xhttp.status == 200){
+            var response = JSON.parse(xhttp.responseText);
+            themesArray = response.items;
+        }   
+    }
+
+    function showThemeCreateBox() {
+        
+        console.log(themesArray);
+        Swal.fire({
+            title: 'Criar Tema',
+            html:
+            '<input id="id" type="hidden">' +
+            '<input id="name" class="swal2-input" placeholder="Nome">' +
+            '<input id="price" type="number" step="0.01" class="swal2-input" placeholder="Preço">' +
+            '<input id="piece1_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça1_id">' +
+            '<input id="piece2_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça2_id">' +
+            '<input id="board_id" type="number" min="0" step="1" class="swal2-input" placeholder="Tabuleiro_id">',
+            focusConfirm: false,
+            preConfirm: async () => {
+                if (!document.getElementById('name').value || !document.getElementById('price').value || !document.getElementById('piece1_id').value || !document.getElementById('piece2_id').value || !document.getElementById('board_id').value){
+                    Swal.showValidationMessage('Algum campo incompleto')
+                }
+                else if (document.getElementById('piece1_id').value == document.getElementById('piece2_id').value) {
+                    Swal.showValidationMessage('Peça1 e 2 não podem ter o mesmo valor')
+                }
+                else if (!Number.isInteger(Number(document.getElementById('piece1_id').value)) || !Number.isInteger(Number(document.getElementById('piece2_id').value))) {
+                    Swal.showValidationMessage('ID Peça1 e 2 deve ser um número inteiro')
+                }
+                else if (!Number.isInteger(Number(document.getElementById('board_id').value))) {
+                    Swal.showValidationMessage('ID Boad deve ser um número inteiro')
+                }else{
+                    themeCreate();
+                }
+            }
+        })
+    }
+
+    async function themeCreate() {
+        const name = document.getElementById("name").value;
+        var price = document.getElementById("price").value;
+        const piece1_id = document.getElementById("piece1_id").value;
+        const piece2_id = document.getElementById("piece2_id").value;
+        const board_id = document.getElementById("board_id").value;
+        price = Number(price).toFixed(2);
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "http://127.0.0.1:5000/theme/", false);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send(JSON.stringify({ "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id, "themeImage": "TESTE_THEME_IMAGE"}));
+        if(xhttp.status == 200){
+            window.location.reload();
+        }
+    }
+
     function showCreateChip(){
         Swal.fire({
             title: 'Criar Peça',
@@ -29,21 +95,23 @@ export default () => {
     
     async function chipCreate() {
         const name = document.getElementById("name").value;
-        const url = await uploadFile("image-file");
+        /*const url = await uploadFile("image-file");*/
         const name2 = document.getElementById("name2").value;
-        const url2 = await uploadFile("image-file2");
-        let response = await fetch("http://localhost:5000/pieces", {
+        /*const url2 = await uploadFile("image-file2");*/
+        let response = await fetch("http://127.0.0.1:5000/chip/", {
             method: "POST",
             headers:{
-                "Content-Type": "application/json;charset=UTF-8"
+                "Content-Type": "application/json;charset=UTF-8",
+                "Authorization": "Bearer " + cookies.token
             },
             body: JSON.stringify({ "name": name, "url": url})
         });
         response = await response.json();
-        let response2 = await fetch("http://localhost:5000/pieces", {
+        let response2 = await fetch("http://127.0.0.1:5000/chip/", {
             method: "POST",
             headers:{
-                "Content-Type": "application/json;charset=UTF-8"
+                "Content-Type": "application/json;charset=UTF-8",
+                "Authorization": "Bearer " + cookies.token
             },
             body: JSON.stringify({ "name": name2, "url": url2})
         });
@@ -104,151 +172,7 @@ export default () => {
             }
         })
     }
-    
-    function showThemeCreateBox() {
-        Swal.fire({
-            title: 'Criar Tema',
-            html:
-            '<input id="id" type="hidden">' +
-            '<input id="name" class="swal2-input" placeholder="Nome">' +
-            '<input id="price" type="number" step="0.01" class="swal2-input" placeholder="Preço">' +
-            '<input id="piece1_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça1_id">' +
-            '<input id="piece2_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça2_id">' +
-            '<input id="board_id" type="number" min="0" step="1" class="swal2-input" placeholder="Tabuleiro_id">',
-            focusConfirm: false,
-            preConfirm: async () => {
-                if (!document.getElementById('name').value || !document.getElementById('price').value || !document.getElementById('piece1_id').value || !document.getElementById('piece2_id').value || !document.getElementById('board_id').value){
-                    Swal.showValidationMessage('Algum campo incompleto')
-                }
-                else if (document.getElementById('piece1_id').value == document.getElementById('piece2_id').value) {
-                    Swal.showValidationMessage('Peça1 e 2 não podem ter o mesmo valor')
-                }
-                else if (!Number.isInteger(Number(document.getElementById('piece1_id').value)) || !Number.isInteger(Number(document.getElementById('piece2_id').value))) {
-                    Swal.showValidationMessage('ID Peça1 e 2 deve ser um número inteiro')
-                }
-                else if (!Number.isInteger(Number(document.getElementById('board_id').value))) {
-                    Swal.showValidationMessage('ID Boad deve ser um número inteiro')
-                }else{
-                    themeCreate();
-                }
-            }
-        })
-    }
-    
-    async function themeCreate() {
-        const name = document.getElementById("name").value;
-        var price = document.getElementById("price").value;
-        const piece1_id = document.getElementById("piece1_id").value;
-        const piece2_id = document.getElementById("piece2_id").value;
-        const board_id = document.getElementById("board_id").value;
-        price = Number(price).toFixed(2);
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "http://localhost:5000/themes");
-        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhttp.send(JSON.stringify({ "name": name, "price": price, "piece1_id": piece1_id, "piece2_id": piece2_id, "board_id": board_id}));
-        xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-        const objects = JSON.parse(this.responseText);
-        Swal.fire(objects['message']);
-        loadTable();
-        }
-        };
-    }
-    
-    function showThemeEditBox(id) {
-        console.log(id);
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "http://localhost:5000/themes/"+id);
-        xhttp.send();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-            const objects = JSON.parse(this.responseText);
-            const theme = objects;
-            console.log(theme);
-            Swal.fire({
-                title: 'Editar Tema',
-                html:
-                '<input id="id" type="hidden" value='+theme['id']+'>' +
-                '<input id="name" class="swal2-input" placeholder="Nome" value="'+theme['name']+'">' +
-                '<input id="price" type="number" step="0.01" class="swal2-input" placeholder="Preço" value="'+theme['price']+'">' +
-                '<input id="piece1_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça1_id" value="'+theme['piece1_id']+'">' +
-                '<input id="piece2_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça2_id" value="'+theme['piece2_id']+'">' +
-                '<input id="board_id" type="number" min="0" step="1" class="swal2-input" placeholder="Tabuleiro_id" value="'+theme['board_id']+'">',
-                focusConfirm: false,
-                preConfirm: () => {
-                    if (!document.getElementById('name').value || !document.getElementById('price').value || !document.getElementById('piece1_id').value || !document.getElementById('piece2_id').value || !document.getElementById('board_id').value){
-                        Swal.showValidationMessage('Algum campo incompleto')
-                    }
-                    else if (document.getElementById('piece1_id').value == document.getElementById('piece2_id').value) {
-                        Swal.showValidationMessage('Peça1 e 2 não podem ter o mesmo valor')
-                    }
-                    else if (!Number.isInteger(Number(document.getElementById('piece1_id').value)) || !Number.isInteger(Number(document.getElementById('piece2_id').value))) {
-                        Swal.showValidationMessage('ID Peça1 e 2 deve ser um número inteiro')
-                    }
-                    else if (!Number.isInteger(Number(document.getElementById('board_id').value))) {
-                        Swal.showValidationMessage('ID Boad deve ser um número inteiro')
-                    }else{
-                        themeEdit();
-                    }
-                }
-            })
-            }
-        };
-    }
-        
-    async function themeEdit() {
-        const id = document.getElementById("id").value;
-        const name = document.getElementById("name").value;
-        var price = document.getElementById("price").value;
-        const piece1_id = document.getElementById("piece1_id").value;
-        const piece2_id = document.getElementById("piece2_id").value;
-        const board_id = document.getElementById("board_id").value;
-        price = Number(price).toFixed(2);
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("PUT", "http://localhost:5000/themes/"+id);
-        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhttp.send(JSON.stringify({ "id": id, "name": name, "price": price, "piece1_id": piece1_id, "piece2_id": piece2_id, "board_id": board_id}));
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-            const objects = JSON.parse(this.responseText);
-            Swal.fire(objects['message']);
-            loadTable();
-            }
-        };
-    }
-    
-    function themeDelete(id) {
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("DELETE", "http://localhost:5000/themes/"+id);
-        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhttp.send(JSON.stringify({ 
-            "id": id
-        }));
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4) {
-            const objects = JSON.parse(this.responseText);
-            Swal.fire(objects['message']);
-            loadTable();
-            } 
-        };
-    }
-    
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Tem certeza que deseja apagar esse tema?',
-            text: "Essa ação é irreversível!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Deletar!'
-            }).then((result) => {
-            if (result.isConfirmed) {
-                themeDelete(id); 
-            }
-        })
-    }
-    
+
     function uploadFile(id) {
         return new Promise((resolve, rejected) => {
             var files = document.getElementById(id).files;
@@ -273,34 +197,31 @@ export default () => {
             }
         })
     }
-*/
     return (
         <div className="Tema">
-                <div class="TemaContainer">
-                    <div class="d-flex bd-highlight mb-3">
-                        <div class="me-auto p-2 bd-highlight"><h2>Temas</h2></div>
-                        <div class="p-2 bd-highlight">
+                <div className="TemaContainer">
+                    <div className="d-flex bd-highlight mb-3">
+                        <div className="me-auto p-2 bd-highlight"><h2>Temas</h2></div>
+                        <div className="p-2 bd-highlight">
                             <button
                             type="button"
-                            class="btn btn-primary big-screen-button"
+                            className="btn btn-primary big-screen-button"
                             id="create"
-                            onclick="{showThemeCreateBox()}"
-                            >
+                            onClick={() => showThemeCreateBox()}>
                             Criar
                             </button>
                             <button
                             type="button"
-                            class="btn btn-primary big-screen-button"
+                            className="btn btn-primary big-screen-button"
                             id="create"
-                            onclick="{showCreateChip()}"
-                            >
+                            onClick={() => showCreateChip()}>
                             Criar Tudo
                             </button>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table">
+                    <div className="table-responsive">
+                        <table className="table">
                             <thead>
                                 <tr>
                                 <th scope="col">#</th>
@@ -312,10 +233,10 @@ export default () => {
                                 <th scope="col">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="mytable">
-                                <tr>
-                                <th scope="row" colspan="5">Carregando...</th>
-                                </tr>
+                            <tbody id="mytable" onLoad={loadTable()}>
+                                {themesArray.map(theme=>{
+                                    return(<AdminTable key={theme['id']} tipoTable="Tema" idTema={theme['id']} nomeTema={theme['name']} precoTema={theme['price']} urlPeca1={theme['piece1_url']} nomePeca1={theme['piece1_name']} urlPeca2={theme['piece2_url']} nomePeca2={theme['piece2_name']} urlTabuleiro={theme['board_url']} nomeTabuleiro={theme['board_name']}/>)
+                                    })}
                             </tbody>
                         </table>
                     </div>
