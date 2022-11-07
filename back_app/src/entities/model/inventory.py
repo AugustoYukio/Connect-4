@@ -3,7 +3,7 @@ from sqlalchemy import event
 try:
     from back_app.src.entities.model import db
 except ImportError:
-    from src.entities.model import db
+    from . import db
 
 
 class Inventory(db.Model):

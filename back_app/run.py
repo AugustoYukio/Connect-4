@@ -3,7 +3,7 @@ from os.path import dirname, isfile, join
 from dotenv import load_dotenv
 import eventlet.wsgi
 try:
-    from back_app.factory import check_and_upgrade_all_tables
+    from factory import check_and_upgrade_all_tables
 except ModuleNotFoundError:
     from factory import check_and_upgrade_all_tables
 

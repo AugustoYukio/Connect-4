@@ -4,7 +4,7 @@ from sqlalchemy import Column, DateTime, CheckConstraint, func, event
 try:
     from back_app.src.entities.model import db
 except ImportError:
-    from src.entities.model import db
+    from . import db
 
 
 class Board(db.Model):

@@ -6,7 +6,7 @@ from sqlalchemy.orm import backref, relationship
 try:
     from back_app.src.entities.model import db
 except ImportError:
-    from src.entities.model import db
+    from . import db
 
 
 class Theme(db.Model):

@@ -5,7 +5,7 @@ from sqlalchemy import Column, DateTime, func, event
 try:
     from back_app.src.entities.model import db
 except ImportError:
-    from src.entities.model import db
+    from . import db
 
 
 class Chip(db.Model):
@@ -20,6 +20,7 @@ class Chip(db.Model):
 
 @event.listens_for(Chip.__table__, 'after_create')
 def insert_initial_values(*args, **kwargs):
+    import ipdb;ipdb.set_trace()
     db.session.add(
         Chip(name="default_1", url=os.getenv('DEFAULT_CHIP1_URL', 'DEFAULT_CHIP1_URL'))
     )

@@ -5,7 +5,7 @@ from sqlalchemy import event
 try:
     from back_app.src.entities.model import db, bcrypt_flask
 except ImportError:
-    from src.entities.model import db, bcrypt_flask
+    from . import db, bcrypt_flask
 
 
 class User(db.Model):

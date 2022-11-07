@@ -1,10 +1,10 @@
-from back_app import Inventory
 from ..entities.DTO import (
     ValidationError, validate_inventory_schema, validate_inventory_schema, success_create_inventory_schema,
     fail_creation_inventory_schema, success_get_inventory_schema, fail_get_inventory_schema,
     success_delete_inventory_schema, fail_delete_inventory_schema, success_update_inventory_schema,
     fail_update_inventory_schema
 )
+from ..entities.model.inventory import Inventory
 
 
 def delete_inventory_item(current_app, user_id, theme_id):

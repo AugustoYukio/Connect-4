@@ -5,6 +5,7 @@ import ipdb
 from flask_jwt_extended import create_access_token, create_refresh_token
 from pytest import fixture
 from back_app.factory import check_and_upgrade_all_tables
+from back_app.src.utils.users import make_login_response
 
 
 # from back_app.factory import create_app
@@ -64,9 +65,10 @@ def unauthenticated_headers():
 
 @fixture
 def header_with_access_token(app, client):
-    acess_token = create_access_token(identity=1, expires_delta=timedelta(days=5))
-    refresh_token = create_refresh_token(identity=1)
+    from back_app.src.entities.model.user import User
+
+    login_response = make_login_response(User.query.get(0))
     return {
-        'Authorization': f'Bearer {acess_token}',
+        'Authorization': f'Bearer {login_response["token"]}',
         'Content-Type': 'application/json'
     }
