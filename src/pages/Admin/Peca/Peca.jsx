@@ -1,25 +1,42 @@
 import React from "react";
 import './Peca.css'
+import { useCookies } from "react-cookie";
+import Swal from 'sweetalert2'
+import AdminTable from '../../../components/AdminTable/AdminTable'
 
 export default () => {
+    const [cookies] = useCookies();
+    var chipsArray = new Array();
+
+    function loadTable() {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://127.0.0.1:5000/chip/", false);
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send();
+        if(xhttp.status == 200){
+            var response = JSON.parse(xhttp.responseText);
+            chipsArray = response.items;
+        }   
+    }
+
     return (
       <div className="Peca">
-              <div class="PecaContainer">
-                  <div class="d-flex bd-highlight mb-3">
-                      <div class="me-auto p-2 bd-highlight"><h2>Peça</h2></div>
-                      <div class="p-2 bd-highlight">
+              <div className="PecaContainer">
+                  <div className="d-flex bd-highlight mb-3">
+                      <div className="me-auto p-2 bd-highlight"><h2>Peça</h2></div>
+                      <div className="p-2 bd-highlight">
                           <button
                             type="button"
-                            class="btn btn-primary big-screen-button"
+                            className="btn btn-primary big-screen-button"
                             id="create"
-                            onclick="showChipCreateBox()">
+                            onClick="showChipCreateBox()">
                             Criar
                           </button>
                       </div>
                   </div>
 
-                  <div class="table-responsive">
-                      <table class="table">
+                  <div className="table-responsive">
+                      <table className="table">
                           <thead>
                               <tr>
                               <th scope="col">#</th>
@@ -28,10 +45,10 @@ export default () => {
                               <th scope="col">Ações</th>
                               </tr>
                           </thead>
-                          <tbody id="mytable">
-                              <tr>
-                              <th scope="row" colspan="5">Carregando...</th>
-                              </tr>
+                          <tbody id="mytable" onLoad={loadTable()}>
+                            {chipsArray.map(chip=>{
+                                return(<AdminTable key={chip['id']} tipoTable="Peça" idPeca={chip['id']} nomePeca={chip['name']} urlPeca={chip['url']}/>)
+                                })}
                           </tbody>
                       </table>
                   </div>

@@ -3,7 +3,7 @@ import "./AdminTable.css"
 import Swal from 'sweetalert2'
 import { useCookies } from "react-cookie";
 
-export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, urlPeca2, nomePeca2, urlTabuleiro, nomeTabuleiro, ...props }) => {
+export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, urlPeca2, nomePeca2, idTabuleiro, urlTabuleiro, nomeTabuleiro, idPeca, nomePeca, urlPeca, ...props }) => {
     
     const [cookies] = useCookies();
     
@@ -42,40 +42,6 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
                 }
             })
         }   
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-            const objects = JSON.parse(this.responseText);
-            const theme = objects;
-            console.log(theme);
-            Swal.fire({
-                title: 'Editar Tema',
-                html:
-                '<input id="id" type="hidden" value='+theme['id']+'>' +
-                '<input id="name" class="swal2-input" placeholder="Nome" value="'+theme['name']+'">' +
-                '<input id="price" type="number" step="0.01" class="swal2-input" placeholder="Preço" value="'+theme['price']+'">' +
-                '<input id="piece1_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça1_id" value="'+theme['piece1_id']+'">' +
-                '<input id="piece2_id" type="number" min="0" step="1" class="swal2-input" placeholder="Peça2_id" value="'+theme['piece2_id']+'">' +
-                '<input id="board_id" type="number" min="0" step="1" class="swal2-input" placeholder="Tabuleiro_id" value="'+theme['board_id']+'">',
-                focusConfirm: false,
-                preConfirm: () => {
-                    if (!document.getElementById('name').value || !document.getElementById('price').value || !document.getElementById('piece1_id').value || !document.getElementById('piece2_id').value || !document.getElementById('board_id').value){
-                        Swal.showValidationMessage('Algum campo incompleto')
-                    }
-                    else if (document.getElementById('piece1_id').value == document.getElementById('piece2_id').value) {
-                        Swal.showValidationMessage('Peça1 e 2 não podem ter o mesmo valor')
-                    }
-                    else if (!Number.isInteger(Number(document.getElementById('piece1_id').value)) || !Number.isInteger(Number(document.getElementById('piece2_id').value))) {
-                        Swal.showValidationMessage('ID Peça1 e 2 deve ser um número inteiro')
-                    }
-                    else if (!Number.isInteger(Number(document.getElementById('board_id').value))) {
-                        Swal.showValidationMessage('ID Boad deve ser um número inteiro')
-                    }else{
-                        themeEdit();
-                    }
-                }
-            })
-            }
-        };
     }
         
     async function themeEdit() {
@@ -86,21 +52,39 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
         const piece2_id = document.getElementById("piece2_id").value;
         const board_id = document.getElementById("board_id").value;
         price = Number(price).toFixed(2);
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("PUT", "http://localhost:5000/themes/"+id);
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("PUT", "http://127.0.0.1:5000/theme/", false);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhttp.send(JSON.stringify({ "id": id, "name": name, "price": price, "piece1_id": piece1_id, "piece2_id": piece2_id, "board_id": board_id}));
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-            const objects = JSON.parse(this.responseText);
-            Swal.fire(objects['message']);
-            }
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send(JSON.stringify({ "id": id, "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id}));
+        if(xhttp.status == 202){
+            Swal.fire('Tema alterado com sucesso!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+              });
         };
     }
 
-    function confirmDelete(id) {
+    function confirmDelete(id, tipo){
+        var complemento = "";
+        var param = "";
+        switch (tipo) {
+            case "Tema":
+                complemento = "esse tema";
+                param = "theme";
+                break;
+            case "Peça":
+                complemento = "essa peça";
+                param = "chip";
+                break;
+            case "Tabuleiro":
+                complemento = "esse tabuleiro";
+                param = "board";
+                break;
+        }
         Swal.fire({
-            title: 'Tem certeza que deseja apagar esse tema?',
+            title: `Tem certeza que deseja apagar ${complemento}?`,
             text: "Essa ação é irreversível!",
             icon: 'warning',
             showCancelButton: true,
@@ -109,23 +93,26 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
             confirmButtonText: 'Deletar!'
             }).then((result) => {
             if (result.isConfirmed) {
-                themeDelete(id); 
+                doDelete(id, param)
             }
         })
     }
-    
-    function themeDelete(id) {
-        console.log("APAGANDO");
+
+    function doDelete(id, param){
         let xhttp = new XMLHttpRequest();
-        xhttp.open("DELETE", "http://127.0.0.1:5000/theme/"+id, false);
+        xhttp.open("DELETE", `http://127.0.0.1:5000/${param}/`+id, false);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
         xhttp.send();
         if(xhttp.status == 202){
-            window.location.reload();
+            Swal.fire('Deletado!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+              });
         };
     }
-    
+
     switch(tipoTable){
         case 'Tema':
             return (
@@ -138,10 +125,33 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
                     <td><a href={`upload/${urlTabuleiro}`} target="_blank" rel="noopener noreferrer">{nomeTabuleiro}</a></td>
                     <td>
                         <button type="button" className="btn btn-outline-secondary" onClick={()=>showThemeEditBox(idTema)}>Edit</button>
-                        <button type="button" className="btn btn-outline-danger" onClick={()=>confirmDelete(idTema)}>Del</button>
+                        <button type="button" className="btn btn-outline-danger" onClick={()=>confirmDelete(idTema, tipoTable)}>Del</button>
                     </td>
                 </tr>
             );
-        case '': break;
+        case 'Peça': 
+            return (
+                <tr>
+                    <td>{idPeca}</td>
+                    <td>{nomePeca}</td>
+                    <td><a href={`upload/${urlPeca}`} target="_blank" rel="noopener noreferrer">Link</a></td>
+                    <td>
+                        <button type="button" className="btn btn-outline-secondary" onClick={()=>showChipEditBox(idPeca)}>Edit</button>
+                        <button type="button" className="btn btn-outline-danger" onClick={()=>confirmDelete(idPeca, tipoTable)}>Del</button>
+                    </td>
+                </tr>
+            );
+        case 'Tabuleiro':
+            return (
+                <tr>
+                    <td>{idTabuleiro}</td>
+                    <td>{nomeTabuleiro}</td>
+                    <td><a href={`upload/${urlTabuleiro}`} target="_blank" rel="noopener noreferrer">Link</a></td>
+                    <td>
+                        <button type="button" className="btn btn-outline-secondary" onClick={()=>showBoardEditBox(idTabuleiro)}>Edit</button>
+                        <button type="button" className="btn btn-outline-danger" onClick={()=>confirmDelete(idTabuleiro, tipoTable)}>Del</button>
+                    </td>
+                </tr>
+            )
     }
 }

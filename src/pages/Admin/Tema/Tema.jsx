@@ -63,8 +63,8 @@ export default () => {
         xhttp.open("POST", "http://127.0.0.1:5000/theme/", false);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
-        xhttp.send(JSON.stringify({ "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id, "themeImage": "TESTE_THEME_IMAGE"}));
-        if(xhttp.status == 200){
+        xhttp.send(JSON.stringify({ "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id, "themeImage": "TESTE2_THEME_IMAGE"}));
+        if(xhttp.status == 201){
             window.location.reload();
         }
     }
@@ -96,8 +96,10 @@ export default () => {
     async function chipCreate() {
         const name = document.getElementById("name").value;
         /*const url = await uploadFile("image-file");*/
+        const url = "TESTE1"
         const name2 = document.getElementById("name2").value;
         /*const url2 = await uploadFile("image-file2");*/
+        const url2 = "TESTE2"
         let response = await fetch("http://127.0.0.1:5000/chip/", {
             method: "POST",
             headers:{
@@ -138,18 +140,22 @@ export default () => {
     
     async function boardCreate(id, id2) {
         const name = document.getElementById("name").value;
-        const url = await uploadFile("image-file");
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "http://localhost:5000/boards");
+        //const url = await uploadFile("image-file");
+        const url = "TESTE"
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "http://127.0.0.1:5000/board/", false);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
         xhttp.send(JSON.stringify({ "name": name, "url": url}));
-        xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-        const objects = JSON.parse(this.responseText);
-        Swal.fire(objects['message']);
-        showThemeCreateAllBox(id, id2, objects["id"]);
+        if(xhttp.status == 200){
+            var jResponse = JSON.parse(xhttp.responseText);
+            var boardId = jResponse[0].id;
+            Swal.fire('Peças e tabuleiros criados!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    showThemeCreateAllBox(id, id2, boardId);
+                }
+            });
         }
-        };
     }
     
     function showThemeCreateAllBox(piece1_id, piece2_id, board_id) {
@@ -173,6 +179,7 @@ export default () => {
         })
     }
 
+    /*
     function uploadFile(id) {
         return new Promise((resolve, rejected) => {
             var files = document.getElementById(id).files;
@@ -197,6 +204,7 @@ export default () => {
             }
         })
     }
+    */
     return (
         <div className="Tema">
                 <div className="TemaContainer">
