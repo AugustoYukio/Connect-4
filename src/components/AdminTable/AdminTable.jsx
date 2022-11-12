@@ -26,7 +26,7 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
                 focusConfirm: false,
                 preConfirm: () => {
                     if (!document.getElementById('name').value || !document.getElementById('price').value || !document.getElementById('piece1_id').value || !document.getElementById('piece2_id').value || !document.getElementById('board_id').value){
-                        Swal.showValidationMessage('Algum campo incompleto')
+                        Swal.showValidationMessage('Existe algum campo incompleto')
                     }
                     else if (document.getElementById('piece1_id').value == document.getElementById('piece2_id').value) {
                         Swal.showValidationMessage('Peça1 e 2 não podem ter o mesmo valor')
@@ -43,7 +43,7 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
             })
         }   
     }
-        
+       
     async function themeEdit() {
         const id = document.getElementById("id").value;
         const name = document.getElementById("name").value;
@@ -58,7 +58,7 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
         xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
         xhttp.send(JSON.stringify({ "id": id, "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id}));
         if(xhttp.status == 202){
-            Swal.fire('Tema alterado com sucesso!','','success').then((result) => {
+            Swal.fire('Tema editado com sucesso!','','success').then((result) => {
                 if (result.isConfirmed || result.isDismissed) {
                     window.location.reload();
                 }
@@ -66,6 +66,97 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
         };
     }
 
+    function showChipEditBox(id) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://127.0.0.1:5000/chip/"+id, false);
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send();
+        if(xhttp.status == 200){
+            const chip = JSON.parse(xhttp.responseText);
+            Swal.fire({
+                title: 'Editar Peça',
+                html:
+                '<input id="id" type="hidden" value='+chip['id']+'>' +
+                '<input id="url" type="hidden" value="'+chip['url']+'">' +
+                '<input id="name" class="swal2-input" placeholder="Nome" value="'+chip['name']+'">' +
+                '<input id="image-file" type="file" accept="image/*" style="margin-top: 20px;"/>',
+                focusConfirm: false,
+                preConfirm: () => {
+                chipEdit();
+                }
+            })
+        };
+    }
+      
+    async function chipEdit() {
+        const id = document.getElementById("id").value;
+        const name = document.getElementById("name").value;
+        var url = document.getElementById("url").value;
+        /*
+        if(document.getElementById('image-file').files[0]){
+            url = await uploadFile();
+        }
+        */
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("PUT", "http://127.0.0.1:5000/chip/", false);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send(JSON.stringify({ "id": id, "name": name, "url": url}));
+        if(xhttp.status == 202){
+            Swal.fire('Peça editada com sucesso!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+              });
+        };
+    }
+
+    function showBoardEditBox(id) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://127.0.0.1:5000/board/"+id, false);
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send();
+        if(xhttp.status == 200){
+            const board = JSON.parse(xhttp.responseText);;
+            Swal.fire({
+                title: 'Editar Tabuleiro',
+                html:
+                '<input id="id" type="hidden" value='+board['id']+'>' +
+                '<input id="url" type="hidden" value="'+board['url']+'">' +
+                '<input id="name" class="swal2-input" placeholder="Nome" value="'+board['name']+'">' +
+                '<input id="image-file" type="file" accept="image/*" style="margin-top: 20px;"/>',
+                focusConfirm: false,
+                preConfirm: () => {
+                boardEdit();
+                }
+            })
+        };
+    }
+        
+    async function boardEdit() {
+        const id = document.getElementById("id").value;
+        const name = document.getElementById("name").value;
+        var url = document.getElementById("url").value;
+        /*
+        if(document.getElementById('image-file').files[0]){
+            url = await uploadFile();
+        }
+        */
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("PUT", "http://127.0.0.1:5000/board/", false);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send(JSON.stringify({ "id": id, "name": name, "url": url}));
+        if(xhttp.status == 202){
+            Swal.fire('Tabuleiro editado com sucesso!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+              });
+        };
+    }
+    
+    
     function confirmDelete(id, tipo){
         var complemento = "";
         var param = "";
@@ -84,7 +175,7 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
                 break;
         }
         Swal.fire({
-            title: `Tem certeza que deseja apagar ${complemento}?`,
+            title: `Tem certeza que deseja deletar ${complemento}?`,
             text: "Essa ação é irreversível!",
             icon: 'warning',
             showCancelButton: true,
@@ -105,7 +196,7 @@ export default ({ tipoTable, idTema, nomeTema, precoTema, urlPeca1, nomePeca1, u
         xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
         xhttp.send();
         if(xhttp.status == 202){
-            Swal.fire('Deletado!','','success').then((result) => {
+            Swal.fire('Deletado com sucesso!','','success').then((result) => {
                 if (result.isConfirmed || result.isDismissed) {
                     window.location.reload();
                 }

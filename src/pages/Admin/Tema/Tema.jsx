@@ -19,6 +19,27 @@ export default () => {
             themesArray = response.items;
         }   
     }
+    
+    function showThemeCreateAllBox(piece1_id, piece2_id, board_id) {
+        Swal.fire({
+            title: 'Criar Tema',
+            html:
+            '<input id="id" type="hidden">' +
+            '<input id="name" class="swal2-input" placeholder="Nome">' +
+            '<input id="price" type="number" step="0.01" class="swal2-input" placeholder="Preço">' +
+            '<input id="piece1_id" type="number" class="swal2-input" value="'+piece1_id+'" readonly>' +
+            '<input id="piece2_id" type="number" class="swal2-input" value="'+piece2_id+'" readonly>' +
+            '<input id="board_id" type="number" class="swal2-input" value="'+board_id+'" readonly>',
+            focusConfirm: false,
+            preConfirm: async () => {
+                if (!document.getElementById('name').value || !document.getElementById('price').value){
+                    Swal.showValidationMessage('Existe algum campo incompleto')
+                }else{
+                    themeCreate();
+                }
+            }
+        })
+    }
 
     function showThemeCreateBox() {
         
@@ -35,7 +56,7 @@ export default () => {
             focusConfirm: false,
             preConfirm: async () => {
                 if (!document.getElementById('name').value || !document.getElementById('price').value || !document.getElementById('piece1_id').value || !document.getElementById('piece2_id').value || !document.getElementById('board_id').value){
-                    Swal.showValidationMessage('Algum campo incompleto')
+                    Swal.showValidationMessage('Existe algum campo incompleto')
                 }
                 else if (document.getElementById('piece1_id').value == document.getElementById('piece2_id').value) {
                     Swal.showValidationMessage('Peça1 e 2 não podem ter o mesmo valor')
@@ -63,15 +84,19 @@ export default () => {
         xhttp.open("POST", "http://127.0.0.1:5000/theme/", false);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
-        xhttp.send(JSON.stringify({ "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id, "themeImage": "TESTE2_THEME_IMAGE"}));
+        xhttp.send(JSON.stringify({ "name": name, "price": price, "chip1Id": piece1_id, "chip2Id": piece2_id, "boardId": board_id, "themeImage": createGuid()}));
         if(xhttp.status == 201){
-            window.location.reload();
+            Swal.fire('Tema criado com sucesso!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+            });
         }
     }
 
     function showCreateChip(){
         Swal.fire({
-            title: 'Criar Peça',
+            title: 'Criar Peças',
             html:
             '<p>Peça1</p>' +
             '<input id="id" type="hidden">' +
@@ -87,7 +112,7 @@ export default () => {
                     chipCreate();
                 }
                 else{
-                    Swal.showValidationMessage('Algum campo incompleto')
+                    Swal.showValidationMessage('Existe algum campo incompleto')
                 }
             }
         })
@@ -95,11 +120,11 @@ export default () => {
     
     async function chipCreate() {
         const name = document.getElementById("name").value;
-        /*const url = await uploadFile("image-file");*/
-        const url = "TESTE1"
+        //const url = await uploadFile("image-file");
+        const url = createGuid();
         const name2 = document.getElementById("name2").value;
-        /*const url2 = await uploadFile("image-file2");*/
-        const url2 = "TESTE2"
+        //const url2 = await uploadFile("image-file2");
+        const url2 = createGuid();
         let response = await fetch("http://127.0.0.1:5000/chip/", {
             method: "POST",
             headers:{
@@ -120,6 +145,7 @@ export default () => {
         response2 = await response2.json();
         showBoardCreateBox(response["id"], response2["id"]);
     }
+    
     function showBoardCreateBox(id, id2){
         Swal.fire({
             title: 'Criar Tabuleiro',
@@ -132,7 +158,7 @@ export default () => {
                 if (document.getElementById('name').value && document.getElementById('image-file').files[0]) {
                     boardCreate(id, id2);
                 }else{
-                    Swal.showValidationMessage('Algum campo incompleto')
+                    Swal.showValidationMessage('Existe algum campo incompleto')
                 }
             }
         })
@@ -141,7 +167,7 @@ export default () => {
     async function boardCreate(id, id2) {
         const name = document.getElementById("name").value;
         //const url = await uploadFile("image-file");
-        const url = "TESTE"
+        const url = createGuid();
         let xhttp = new XMLHttpRequest();
         xhttp.open("POST", "http://127.0.0.1:5000/board/", false);
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -150,35 +176,22 @@ export default () => {
         if(xhttp.status == 200){
             var jResponse = JSON.parse(xhttp.responseText);
             var boardId = jResponse[0].id;
-            Swal.fire('Peças e tabuleiros criados!','','success').then((result) => {
+            Swal.fire('Peças e tabuleiro criados com sucesso!','','success').then((result) => {
                 if (result.isConfirmed || result.isDismissed) {
                     showThemeCreateAllBox(id, id2, boardId);
                 }
             });
         }
     }
-    
-    function showThemeCreateAllBox(piece1_id, piece2_id, board_id) {
-        Swal.fire({
-            title: 'Criar Tema',
-            html:
-            '<input id="id" type="hidden">' +
-            '<input id="name" class="swal2-input" placeholder="Nome">' +
-            '<input id="price" type="number" step="0.01" class="swal2-input" placeholder="Preço">' +
-            '<input id="piece1_id" type="number" class="swal2-input" value="'+piece1_id+'" readonly>' +
-            '<input id="piece2_id" type="number" class="swal2-input" value="'+piece2_id+'" readonly>' +
-            '<input id="board_id" type="number" class="swal2-input" value="'+board_id+'" readonly>',
-            focusConfirm: false,
-            preConfirm: async () => {
-                if (!document.getElementById('name').value || !document.getElementById('price').value){
-                    Swal.showValidationMessage('Algum campo incompleto')
-                }else{
-                    themeCreate();
-                }
-            }
-        })
-    }
 
+    //Função de criação de Guid apenas para ter uma string única nos temas/imagens dos cadastros criados enquanto não tiver upload
+    function createGuid()  
+    {  
+       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {  
+          var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);  
+          return v.toString(16);  
+       });  
+    }  
     /*
     function uploadFile(id) {
         return new Promise((resolve, rejected) => {

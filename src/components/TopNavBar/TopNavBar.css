@@ -6,7 +6,7 @@
 
 /* Style the links inside the navigation bar */
 .topnav a {
-  float: right;
+  float: left;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
@@ -27,7 +27,7 @@
 }
 /* Style the links inside the navigation bar */
 .topnav button {
-  float: right;
+  float: left;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
@@ -48,9 +48,10 @@
   color: white;
 }
 .topNavImg {
-  float: right;
+  float: left;
   color: #f2f2f2;
-  padding: 14px 16px;
   text-decoration: none;
   border: none;
+  height: 38px;
+  width: 38px;
 }

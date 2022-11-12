@@ -7,10 +7,10 @@ export default ({urlToTema, labelTema, urlToPeca, labelPeca, urlToTabuleiro, lab
     return (
         <div className="topnav">
             <nav className="topnav">
+                <button className="topnav" onClick={()=>history.push('/home')}><img className="topNavImg" src={require("../../res/img/spinningchip.gif")} /></button> 
+                <Link to={urlToTema}>{labelTema}</Link>
                 <Link to={urlToPeca}>{labelPeca}</Link>
                 <Link to={urlToTabuleiro}>{labelTabuleiro}</Link>
-                <Link to={urlToTema}>{labelTema}</Link>
-                <button className="topnav" onClick={()=>history.push('/home')}>Menu</button> 
             </nav>
         </div>
     )

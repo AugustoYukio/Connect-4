@@ -8,7 +8,7 @@ import Tabuleiro from'./Tabuleiro/Tabuleiro'
 
 export default () => {
   const { path, url } = useRouteMatch();
-
+  
     return (
       <div className="Admin">
         <TopNav urlToTema={`${path}/tema`} labelTema="Tema" urlToPeca={`${path}/peca`} labelPeca="Peça" urlToTabuleiro={`${path}/tabuleiro`} labelTabuleiro="Tabuleiro"/>

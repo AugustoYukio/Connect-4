@@ -19,6 +19,51 @@ export default () => {
         }   
     }
 
+    function showBoardCreateBox() {
+        Swal.fire({
+            title: 'Criar Tabuleiro',
+            html:
+            '<input id="id" type="hidden">' +
+            '<input id="name" class="swal2-input" placeholder="Nome">' +
+            '<input id="image-file" type="file" accept="image/*" style="margin-top: 20px;"/>',
+            focusConfirm: false,
+            preConfirm: async () => {
+                if (document.getElementById('name').value && document.getElementById('image-file').files[0]) {
+                    boardCreate();
+                }else{
+                    Swal.showValidationMessage('Existe algum campo incompleto')
+                }
+            }
+        })
+    }
+    
+    async function boardCreate() {
+        const name = document.getElementById("name").value;
+        //const url = await uploadFile();
+        const url = createGuid();
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "http://127.0.0.1:5000/board/", false);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send(JSON.stringify({ "name": name, "url": url}));
+        if(xhttp.status == 200){
+            Swal.fire('Tabuleiro criado com sucesso!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+    //Função de criação de Guid apenas para ter uma string única nos temas/imagens dos cadastros criados enquanto não tiver upload
+    function createGuid()  
+    {  
+       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {  
+          var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);  
+          return v.toString(16);  
+       });  
+    }  
+
     return (
       <div className="Tabuleiro">
               <div className="TabuleiroContainer">
@@ -29,7 +74,7 @@ export default () => {
                           type="button"
                           className="btn btn-primary big-screen-button"
                           id="create"
-                          onClick="showBoardCreateBox()">
+                          onClick={()=>showBoardCreateBox()}>
                           Criar
                           </button>
                       </div>

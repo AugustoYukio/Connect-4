@@ -19,6 +19,51 @@ export default () => {
         }   
     }
 
+    function showChipCreateBox() {
+        Swal.fire({
+            title: 'Criar Peça',
+            html:
+            '<input id="id" type="hidden">' +
+            '<input id="name" class="swal2-input" placeholder="Nome">' +
+            '<input id="image-file" type="file" accept="image/*" style="margin-top: 20px;"/>',
+            focusConfirm: false,
+            preConfirm: async () => {
+                if (document.getElementById('name').value && document.getElementById('image-file').files[0]) {
+                    chipCreate();
+                }else{
+                    Swal.showValidationMessage('Existe algum campo incompleto')
+                }
+            }
+        })
+    }
+    
+    async function chipCreate() {
+        const name = document.getElementById("name").value;
+        //const url = await uploadFile();
+        const url = createGuid();
+        let xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "http://127.0.0.1:5000/chip/", false);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Authorization", "Bearer " + cookies.token);
+        xhttp.send(JSON.stringify({ "name": name, "url": url}));
+        if(xhttp.status == 201){
+            Swal.fire('Peça criada com sucesso!','','success').then((result) => {
+                if (result.isConfirmed || result.isDismissed) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+    //Função de criação de Guid apenas para ter uma string única nos temas/imagens dos cadastros criados enquanto não tiver upload
+    function createGuid()  
+    {  
+       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {  
+          var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);  
+          return v.toString(16);  
+       });  
+    }  
+    
     return (
       <div className="Peca">
               <div className="PecaContainer">
@@ -29,7 +74,7 @@ export default () => {
                             type="button"
                             className="btn btn-primary big-screen-button"
                             id="create"
-                            onClick="showChipCreateBox()">
+                            onClick={()=>showChipCreateBox()}>
                             Criar
                           </button>
                       </div>
