@@ -1,9 +1,11 @@
 import React from "react";
 import './Home.css';
 import Game from "../Game/Game"
+import GameList from "../GameList/GameList";
 import Menu from "../Menu/Menu"
 import Admin from "../Admin/Admin"
 import { Route, useRouteMatch } from 'react-router-dom';
+import Shop from "../Shop/Shop";
 import { useCookies } from "react-cookie";
 
 export default () => {
@@ -28,6 +30,12 @@ export default () => {
             </Route>
             <Route path={`${path}/game`}>
                 <Game />
+            </Route>
+            <Route path={`${path}/gamelist`}>
+                <GameList />
+            </Route>
+            <Route path={`${path}/shop`}>
+                <Shop />
             </Route>
             <Route path={`${path}/admin`}>
                 <Admin />
