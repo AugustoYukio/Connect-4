@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useCookies } from 'react-cookie';
 import './SignIn.css';
 import Card from "../../components/Card/Card";
 import Input from "../../components/Input/Input";
@@ -14,6 +15,7 @@ export default () => {
 
     let history = useHistory();
     
+    const [cookies, setCookie] = useCookies(['name']);
     const [login, setLogin] = useState("");
     const [pwd, setPwd] = useState("");
     const [error, setError] = useState(initialErrorState);
@@ -53,13 +55,14 @@ export default () => {
         
         let xhttp = new XMLHttpRequest();
         xhttp.open("POST", "http://127.0.0.1:5000/user/login", false);
-        xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
         xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhttp.send(JSON.stringify({"username": user, "password": password}));
         
         if(xhttp.status == 200){
             var json_response = JSON.parse(xhttp.responseText);
-            localStorage.setItem("token", json_response.token);
+            var parsedJwt = parseJwt(json_response.token);
+            setCookie('token', json_response.token, { path: '/' });
+            setCookie('userID', parsedJwt.sub, { path: '/' });
             return true;
         }
 
@@ -75,6 +78,16 @@ export default () => {
         clearError();        
         validate(login, pwd) ? history.push('/home') : history.push('/signin');
     }
+
+    function parseJwt (token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    
+        return JSON.parse(jsonPayload);
+    };
 
     useEffect(() => {
         setShowError(error.errorList.length > 0)

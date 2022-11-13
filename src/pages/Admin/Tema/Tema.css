@@ -1,0 +1,12 @@
+.Tema {
+  font-size: 1.25rem;
+  background-color: white;
+}
+
+.TemaContainer {
+  margin-top: 50px;
+}
+
+.TemaButton {
+  font-family: "Open Sans", sans-serif;
+}

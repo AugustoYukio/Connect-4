@@ -1,0 +1,12 @@
+.Peca {
+  font-size: 1.25rem;
+  background-color: white;
+}
+
+.PecaContainer {
+  margin-top: 50px;
+}
+
+.PecaButton {
+  font-family: "Open Sans", sans-serif;
+}
