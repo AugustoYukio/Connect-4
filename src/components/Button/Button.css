@@ -10,6 +10,14 @@
   border-radius: 10px;
 }
 
+.Button.ButtonDisabled {
+  background-color: var(--gray);
+}
+
+.Button.ButtonDisabled:active {
+  background-color: var(--gray);
+}
+
 .Button:active {
   background-color: var(--blue);
 }
