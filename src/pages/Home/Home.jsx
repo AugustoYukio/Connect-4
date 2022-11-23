@@ -2,16 +2,14 @@ import React from "react";
 import './Home.css';
 import Game from "../Game/Game"
 import GameList from "../GameList/GameList";
+import Button from "../../components/Button/Button";
 import Menu from "../Menu/Menu"
 import Admin from "../Admin/Admin"
-import Button from "../../components/Button/Button";
 import Shop from "../Shop/Shop";
 
 
 import { Route, useRouteMatch } from 'react-router-dom';
 import { useCookies } from "react-cookie";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse } from '@fortawesome/free-solid-svg-icons'
 
 export default () => {
     const { path, url } = useRouteMatch();
@@ -37,9 +35,11 @@ export default () => {
                 <Game />
             </Route>
             <Route path={`${path}/gamelist`}>
+                <Button home />
                 <GameList />
             </Route>
             <Route path={`${path}/shop`}>
+                <Button home />
                 <Shop />
             </Route>
             <Route path={`${path}/admin`}>

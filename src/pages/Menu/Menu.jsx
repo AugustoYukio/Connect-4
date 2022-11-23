@@ -4,7 +4,7 @@ import "./Menu.css"
 import GameMenu from "../../components/GameMenu/GameMenu";
 import GameMenuOption from "../../components/GameMenuOption/GameMenuOption";
 import User from "../../components/User/User";
-import { Link, useRouteMatch } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
 export default ({showAdm, ...props}) => {
